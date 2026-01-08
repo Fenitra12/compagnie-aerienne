@@ -1,0 +1,4 @@
+com\aerienne\gestion\GestionApplication.class
+com\aerienne\gestion\repository\SimpleEntityRepository.class
+com\aerienne\gestion\controller\SimpleController.class
+com\aerienne\gestion\entity\SimpleEntity.class
