@@ -8,28 +8,7 @@
 </head>
 <body>
 <div class="app-shell">
-    <aside class="sidebar">
-        <div class="brand">
-            <p class="brand-label">compagnie</p>
-            <p class="brand-title">SkyBoard</p>
-            <p class="brand-subtitle">Gestion opérationnelle</p>
-        </div>
-        <nav class="menu">
-                <a class="menu-link" href="/home"
-                    th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/home')} ? ' is-active' : ''">
-                Accueil
-            </a>
-                <a class="menu-link" href="/compagnies"
-                    th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/compagnies')} ? ' is-active' : ''">
-                Compagnies
-            </a>
-                <a class="menu-link" href="/avions"
-                    th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/avions')} ? ' is-active' : ''">
-                Avions
-            </a>
-            <a class="menu-link logout" href="/logout">Déconnexion</a>
-        </nav>
-    </aside>
+    <div th:replace="ui/menu :: menu"></div>
 
     <main class="main-area">
         <header class="main-header">
@@ -54,6 +33,7 @@
                 <div class="pill-group">
                     <a href="/compagnies" class="pill-link">Compagnies</a>
                     <a href="/avions" class="pill-link">Avions</a>
+                    <a href="/vol" class="pill-link">Vols</a>
                 </div>
             </article>
         </section>
@@ -78,6 +58,11 @@
                         <td>Gestion de la flotte</td>
                         <td>Capacités, immatriculations et affectations</td>
                         <td><a href="/avions">Ouvrir</a></td>
+                    </tr>
+                    <tr>
+                        <td>Gestion des vols</td>
+                        <td>Programmation et suivi des vols</td>
+                        <td><a href="/vol">Ouvrir</a></td>
                     </tr>
                     </tbody>
                 </table>

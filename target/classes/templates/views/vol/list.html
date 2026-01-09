@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vols | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="ui/menu :: menu"></div>
+
+    <main class="main-area">
+        <header class="main-header">
+            <div>
+                <p class="eyebrow">Fenitra ETU003660</p>
+                <h1>Vols programmés</h1>
+            </div>
+            <div class="user-chip">
+                <span class="status-dot"></span>
+                <span>Module Vols</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <article class="card">
+                <p class="badge">Inventaire</p>
+                <h2 class="section-title">Vue d'ensemble</h2>
+                <p class="module-description">Nombre de vols programmés</p>
+                <h3 th:text="${vols == null ? '0 vol' : vols.size() + ' vols'}"></h3>
+            </article>
+        </section>
+
+        <section class="table-wrapper">
+            <header>
+                <div>
+                    <p class="badge">Liste</p>
+                    <h2 class="section-title">Vols référencés</h2>
+                </div>
+                <div>
+                    <a href="/vol/add" class="btn-primary">Ajouter</a>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Avion</th>
+                        <th>Départ</th>
+                        <th>Arrivée</th>
+                        <th>Date Départ</th>
+                        <th>Date Arrivée</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="vol : ${vols}">
+                        <td th:text="${vol.idVol}"></td>
+                        <td th:text="${vol.avion.modele} + ' (' + ${vol.avion.numeroImmatriculation} + ')'"></td>
+                        <td th:text="${vol.aeroportDepart.nom} + ' (' + ${vol.aeroportDepart.codeIata} + ')'"></td>
+                        <td th:text="${vol.aeroportArrivee.nom} + ' (' + ${vol.aeroportArrivee.codeIata} + ')'"></td>
+                        <td th:text="${#temporals.format(vol.dateDepart, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${#temporals.format(vol.dateArrivee, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${vol.statut != null ? vol.statut.nom : 'Non défini'}"></td>
+                        <td>
+                            <a th:href="@{/vol/edit/{id}(id=${vol.idVol})}" class="btn-edit">Modifier</a>
+                            <a th:href="@{/vol/delete/{id}(id=${vol.idVol})}" class="btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce vol ?')">Supprimer</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="main-footer">
+            <span>© 2026 Compagnie aérienne</span>
+            <span>Interface conçue pour ETU003660</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

@@ -8,22 +8,7 @@
 </head>
 <body>
 <div class="app-shell">
-    <aside class="sidebar">
-        <div class="brand">
-            <p class="brand-label">compagnie</p>
-            <p class="brand-title">SkyBoard</p>
-            <p class="brand-subtitle">Gestion opérationnelle</p>
-        </div>
-        <nav class="menu">
-                <a class="menu-link" href="/home"
-                    th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/home')} ? ' is-active' : ''">Accueil</a>
-                <a class="menu-link" href="/compagnies"
-                    th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/compagnies')} ? ' is-active' : ''">Compagnies</a>
-                <a class="menu-link" href="/avions"
-                    th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/avions')} ? ' is-active' : ''">Avions</a>
-            <a class="menu-link logout" href="/logout">Déconnexion</a>
-        </nav>
-    </aside>
+    <div th:replace="ui/menu :: menu"></div>
 
     <main class="main-area">
         <header class="main-header">
@@ -52,8 +37,9 @@
                     <p class="badge">Liste</p>
                     <h2 class="section-title">Avions référencés</h2>
                 </div>
-                <span class="module-description"
-                      th:text="${avions == null ? 'Aucune donnée disponible' : avions.size() + ' lignes'}"></span>
+                <div>
+                    <a href="/avions/add" class="btn-primary">Ajouter</a>
+                </div>
             </header>
             <div class="table-responsive">
                 <table class="data-table">
@@ -64,6 +50,7 @@
                         <th>Modèle</th>
                         <th>Capacité</th>
                         <th>Immatriculation</th>
+                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -73,6 +60,10 @@
                         <td th:text="${avion.modele}"></td>
                         <td th:text="${avion.capacite}"></td>
                         <td th:text="${avion.numeroImmatriculation}"></td>
+                        <td>
+                            <a th:href="@{/avions/edit/{id}(id=${avion.idAvion})}" class="btn-edit">Modifier</a>
+                            <a th:href="@{/avions/delete/{id}(id=${avion.idAvion})}" class="btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet avion ?')">Supprimer</a>
+                        </td>
                     </tr>
                     </tbody>
                 </table>

@@ -1,7 +1,8 @@
 package com.aerienne.gestion.model.equipages;
 
-import com.aerienne.gestion.model.vols.Vol;
 import com.aerienne.gestion.model.pilotes.Pilote;
+import com.aerienne.gestion.model.vol.Vol;
+
 import jakarta.persistence.*;
 
 @Entity

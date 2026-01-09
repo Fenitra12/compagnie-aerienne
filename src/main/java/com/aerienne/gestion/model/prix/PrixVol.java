@@ -1,7 +1,8 @@
 package com.aerienne.gestion.model.prix;
 
-import com.aerienne.gestion.model.vols.Vol;
 import com.aerienne.gestion.model.compagnies.Compagnie;
+import com.aerienne.gestion.model.vol.Vol;
+
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

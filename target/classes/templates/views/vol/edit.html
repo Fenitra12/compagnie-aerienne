@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier Vol | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="ui/menu :: menu"></div>
+
+    <main class="main-area">
+        <header class="main-header">
+            <div>
+                <p class="eyebrow">Fenitra ETU003660</p>
+                <h1>Modifier un vol</h1>
+            </div>
+            <div class="user-chip">
+                <span class="status-dot"></span>
+                <span>Module Vols</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <article class="card">
+                <p class="badge">Formulaire</p>
+                <h2 class="section-title">Édition du vol</h2>
+                <p class="module-description">Modifiez les informations du vol</p>
+            </article>
+        </section>
+
+        <section class="form-wrapper">
+            <form th:action="@{/vol/edit/{id}(id=${vol.idVol})}" method="post" th:object="${vol}">
+                <div class="form-group">
+                    <label for="avion">Avion</label>
+                    <select id="avion" th:field="*{avion}" required>
+                        <option value="">Sélectionnez un avion</option>
+                        <option th:each="avion : ${avions}" th:value="${avion.idAvion}" th:text="${avion.modele} + ' (' + ${avion.numeroImmatriculation} + ')'" th:selected="${avion.idAvion == vol.avion.idAvion}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="aeroportDepart">Aéroport de départ</label>
+                    <select id="aeroportDepart" th:field="*{aeroportDepart}" required>
+                        <option value="">Sélectionnez un aéroport</option>
+                        <option th:each="aeroport : ${aeroports}" th:value="${aeroport.idAeroport}" th:text="${aeroport.nom} + ' (' + ${aeroport.codeIata} + ')'" th:selected="${aeroport.idAeroport == vol.aeroportDepart.idAeroport}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="aeroportArrivee">Aéroport d'arrivée</label>
+                    <select id="aeroportArrivee" th:field="*{aeroportArrivee}" required>
+                        <option value="">Sélectionnez un aéroport</option>
+                        <option th:each="aeroport : ${aeroports}" th:value="${aeroport.idAeroport}" th:text="${aeroport.nom} + ' (' + ${aeroport.codeIata} + ')'" th:selected="${aeroport.idAeroport == vol.aeroportArrivee.idAeroport}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dateDepart">Date et heure de départ</label>
+                    <input type="datetime-local" id="dateDepart" th:field="*{dateDepart}" required>
+                </div>
+                <div class="form-group">
+                    <label for="dateArrivee">Date et heure d'arrivée</label>
+                    <input type="datetime-local" id="dateArrivee" th:field="*{dateArrivee}" required>
+                </div>
+                <div class="form-group">
+                    <label for="statut">Statut</label>
+                    <select id="statut" th:field="*{statut}" required>
+                        <option value="">Sélectionnez un statut</option>
+                        <option th:each="statut : ${statuts}" th:value="${statut.idStatut}" th:text="${statut.nom}" th:selected="${statut.idStatut == vol.statut.idStatut}"></option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Modifier</button>
+                    <a href="/vol" class="btn-secondary">Annuler</a>
+                </div>
+            </form>
+        </section>
+
+        <footer class="main-footer">
+            <span>© 2026 Compagnie aérienne</span>
+            <span>Interface conçue pour ETU003660</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

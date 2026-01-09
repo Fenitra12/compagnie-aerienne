@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter Avion | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="ui/menu :: menu"></div>
+
+    <main class="main-area">
+        <header class="main-header">
+            <div>
+                <p class="eyebrow">Fenitra ETU003660</p>
+                <h1>Ajouter un avion</h1>
+            </div>
+            <div class="user-chip">
+                <span class="status-dot"></span>
+                <span>Module Avions</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <article class="card">
+                <h2 class="section-title">Nouvel avion</h2>
+                <form th:action="@{/avions/add}" method="post" th:object="${avion}" class="form">
+                    <div class="form-group">
+                        <label for="compagnie">Compagnie</label>
+                        <select id="compagnie" th:field="*{compagnie}" required>
+                            <option value="">Sélectionner une compagnie</option>
+                            <option th:each="comp : ${compagnies}" th:value="${comp.idCompagnie}" th:text="${comp.nom}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modele">Modèle</label>
+                        <input type="text" id="modele" th:field="*{modele}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="capacite">Capacité</label>
+                        <input type="number" id="capacite" th:field="*{capacite}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="numeroImmatriculation">Numéro d'immatriculation</label>
+                        <input type="text" id="numeroImmatriculation" th:field="*{numeroImmatriculation}" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Ajouter</button>
+                        <a href="/avions" class="btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </article>
+        </section>
+
+        <footer class="main-footer">
+            <span>© 2026 Compagnie aérienne</span>
+            <span>Interface conçue pour ETU003660</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

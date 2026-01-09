@@ -40,6 +40,12 @@ CREATE TABLE Aeroport (
     code_icao CHAR(4) UNIQUE
 );
 
+-- Table StatutVol
+CREATE TABLE StatutVol (
+    id_statut SERIAL PRIMARY KEY,
+    nom VARCHAR(20) UNIQUE NOT NULL
+);
+
 -- Table Vol
 CREATE TABLE Vol (
     id_vol SERIAL PRIMARY KEY,
@@ -48,10 +54,11 @@ CREATE TABLE Vol (
     id_aeroport_arrivee INT NOT NULL,
     date_depart TIMESTAMP NOT NULL,
     date_arrivee TIMESTAMP NOT NULL,
-    statut VARCHAR(20) DEFAULT 'prévu',
+    id_statut INT DEFAULT 1,
     FOREIGN KEY (id_avion) REFERENCES Avion(id_avion),
     FOREIGN KEY (id_aeroport_depart) REFERENCES Aeroport(id_aeroport),
-    FOREIGN KEY (id_aeroport_arrivee) REFERENCES Aeroport(id_aeroport)
+    FOREIGN KEY (id_aeroport_arrivee) REFERENCES Aeroport(id_aeroport),
+    FOREIGN KEY (id_statut) REFERENCES StatutVol(id_statut)
 );
 
 -- Nouvelle table PrixVol (avant Reservation pour éviter l'erreur)
@@ -143,3 +150,32 @@ INSERT INTO Avion (id_compagnie, modele, capacite, numero_immatriculation) VALUE
 (3, 'Boeing 787', 280, 'A6-B78701'),
 (3, 'Airbus A350', 300, 'A6-A35001'),
 (3, 'Boeing 737', 180, 'A6-B73701');
+
+INSERT INTO Aeroport (nom, ville, pays, code_iata, code_icao) VALUES
+('Charles de Gaulle', 'Paris', 'France', 'CDG', 'LFPG'),
+('Heathrow', 'London', 'United Kingdom', 'LHR', 'EGLL'),
+('Frankfurt', 'Frankfurt', 'Germany', 'FRA', 'EDDF'),
+('Dubai International', 'Dubai', 'United Arab Emirates', 'DXB', 'OMDB'),
+('John F. Kennedy', 'New York', 'United States', 'JFK', 'KJFK');
+
+INSERT INTO StatutVol (nom) VALUES
+('PREVU'),
+('CONFIRME'),
+('ANNULE'),
+('RETARDE'),
+('EN_COURS'),
+('TERMINE');
+
+INSERT INTO Vol (id_avion, id_aeroport_depart, id_aeroport_arrivee, date_depart, date_arrivee, id_statut) VALUES
+-- Air France vols
+(1, 1, 2, '2026-01-10 08:00:00', '2026-01-10 10:30:00', 1),
+(2, 1, 4, '2026-01-11 14:00:00', '2026-01-11 22:00:00', 1),
+(3, 1, 5, '2026-01-12 20:00:00', '2026-01-13 08:00:00', 1),
+
+-- Lufthansa vols
+(6, 3, 1, '2026-01-10 12:00:00', '2026-01-10 14:30:00', 1),
+(7, 3, 4, '2026-01-11 16:00:00', '2026-01-12 00:00:00', 1),
+
+-- Emirates vols
+(11, 4, 2, '2026-01-10 18:00:00', '2026-01-11 06:00:00', 1),
+(12, 4, 5, '2026-01-12 22:00:00', '2026-01-13 10:00:00', 1);
