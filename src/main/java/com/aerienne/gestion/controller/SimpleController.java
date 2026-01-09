@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.aerienne.gestion.entity.SimpleEntity;
+import com.aerienne.gestion.model.SimpleEntity;
 import com.aerienne.gestion.repository.SimpleEntityRepository;
 import com.aerienne.gestion.service.SimpleService;
 

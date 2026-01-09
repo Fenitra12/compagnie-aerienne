@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flotte | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <p class="brand-label">compagnie</p>
+            <p class="brand-title">SkyBoard</p>
+            <p class="brand-subtitle">Gestion opérationnelle</p>
+        </div>
+        <nav class="menu">
+                <a class="menu-link" href="/home"
+                    th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/home')} ? ' is-active' : ''">Accueil</a>
+                <a class="menu-link" href="/compagnies"
+                    th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/compagnies')} ? ' is-active' : ''">Compagnies</a>
+                <a class="menu-link" href="/avions"
+                    th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/avions')} ? ' is-active' : ''">Avions</a>
+            <a class="menu-link logout" href="/logout">Déconnexion</a>
+        </nav>
+    </aside>
+
+    <main class="main-area">
+        <header class="main-header">
+            <div>
+                <p class="eyebrow">Fenitra ETU003660</p>
+                <h1>Flotte aérienne</h1>
+            </div>
+            <div class="user-chip">
+                <span class="status-dot"></span>
+                <span>Module Avions</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <article class="card">
+                <p class="badge">Inventaire</p>
+                <h2 class="section-title">Vue d'ensemble</h2>
+                <p class="module-description">Nombre d'appareils suivis dans le système</p>
+                <h3 th:text="${avions == null ? '0 appareil' : avions.size() + ' appareils'}"></h3>
+            </article>
+        </section>
+
+        <section class="table-wrapper">
+            <header>
+                <div>
+                    <p class="badge">Liste</p>
+                    <h2 class="section-title">Avions référencés</h2>
+                </div>
+                <span class="module-description"
+                      th:text="${avions == null ? 'Aucune donnée disponible' : avions.size() + ' lignes'}"></span>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Compagnie</th>
+                        <th>Modèle</th>
+                        <th>Capacité</th>
+                        <th>Immatriculation</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="avion : ${avions}">
+                        <td th:text="${avion.idAvion}"></td>
+                        <td th:text="${avion.compagnie.nom}"></td>
+                        <td th:text="${avion.modele}"></td>
+                        <td th:text="${avion.capacite}"></td>
+                        <td th:text="${avion.numeroImmatriculation}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="main-footer">
+            <span>© 2026 Compagnie aérienne</span>
+            <span>Interface conçue pour ETU003660</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>
