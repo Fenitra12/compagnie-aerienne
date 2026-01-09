@@ -102,6 +102,8 @@ CREATE TABLE Reservation (
     date_reservation TIMESTAMP DEFAULT NOW(),
     siege VARCHAR(5),
     statut VARCHAR(20) DEFAULT 'confirmée',
+    id_vol INT NOT NULL,
+    FOREIGN KEY (id_vol) REFERENCES Vol(id_vol),
     FOREIGN KEY (id_passager) REFERENCES Passager(id_passager),
     FOREIGN KEY (id_prix_vol) REFERENCES PrixVol(id_prix),
     UNIQUE (id_passager, id_prix_vol)
