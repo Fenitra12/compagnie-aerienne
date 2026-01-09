@@ -19,5 +19,24 @@ public class Passager {
     @Column(unique = true)
     private String email;
 
-    // getters & setters
+    public Long getIdPassager() {
+        return idPassager;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public String getPrenom() {
+        return prenom;
+    }
+
+    public LocalDate getDateNaissance() {
+        return dateNaissance;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
 }
