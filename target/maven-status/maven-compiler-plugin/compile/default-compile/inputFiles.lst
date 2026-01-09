@@ -2,6 +2,7 @@ D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\control
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\compagnies\CompagnieController.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\login\HelloController.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\login\LoginController.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\reservation\ReservationController.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\SimpleController.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\vol\VolController.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\GestionApplication.java
@@ -20,6 +21,9 @@ D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\v
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\aeroports\AeroportRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\avions\AvionRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\compagnies\CompagnieRepository.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\passager\PassagerRepository.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\prix\PrixVolRepository.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\reservation\ReservationRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\SimpleEntityRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\utilisateurs\UtilisateurRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\vol\StatutVolRepository.java
@@ -27,6 +31,7 @@ D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\reposit
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\aeroports\AeroportService.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\avions\AvionService.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\compagnies\CompagnieService.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\reservation\ReservationService.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\SimpleService.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\utilisateurs\UtilisateurService.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\vol\StatutVolService.java

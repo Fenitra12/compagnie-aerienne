@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter Réservation | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="ui/menu :: menu"></div>
+
+    <main class="main-area">
+        <header class="main-header">
+            <div>
+                <p class="eyebrow">Fenitra ETU003660</p>
+                <h1>Ajouter une réservation</h1>
+            </div>
+            <div class="user-chip">
+                <span class="status-dot"></span>
+                <span>Module Réservations</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <article class="card">
+                <h2 class="section-title">Nouvelle réservation</h2>
+                <form th:action="@{/reservations/add}" method="post" th:object="${reservation}" class="form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="passagerNom">Nom</label>
+                            <input type="text" id="passagerNom" th:field="*{passager.nom}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="passagerPrenom">Prénom</label>
+                            <input type="text" id="passagerPrenom" th:field="*{passager.prenom}" required>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="passagerDateNaissance">Date de naissance</label>
+                            <input type="date" id="passagerDateNaissance" th:field="*{passager.dateNaissance}">
+                        </div>
+                        <div class="form-group">
+                            <label for="passagerEmail">Email</label>
+                            <input type="email" id="passagerEmail" th:field="*{passager.email}" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="vol">Vol</label>
+                        <select id="vol" th:field="*{vol.idVol}" required>
+                            <option value="">Sélectionner un vol</option>
+                            <option th:each="vol : ${vols}" th:value="${vol.idVol}" th:text="${vol.idVol + ' - ' + vol.aeroportDepart.nom + ' -> ' + vol.aeroportArrivee.nom}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="statut">Statut</label>
+                        <select id="statut" name="statut" th:field="*{statut}">
+                            <option value="confirmée">Confirmée</option>
+                            <option value="annulée">Annulée</option>
+                            <option value="en_attente">En attente</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Ajouter</button>
+                        <a href="/reservations" class="btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </article>
+        </section>
+
+        <footer class="main-footer">
+            <span>© 2026 Compagnie aérienne</span>
+            <span>Interface conçue pour ETU003660</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

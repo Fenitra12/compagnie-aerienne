@@ -181,3 +181,24 @@ INSERT INTO Vol (id_avion, id_aeroport_depart, id_aeroport_arrivee, date_depart,
 -- Emirates vols
 (11, 4, 2, '2026-01-10 18:00:00', '2026-01-11 06:00:00', 1),
 (12, 4, 5, '2026-01-12 22:00:00', '2026-01-13 10:00:00', 1);
+
+INSERT INTO PrixVol (id_vol, id_compagnie, classe, prix) VALUES
+-- Air France vols
+(1, 1, 'Economique', 150.00),
+(1, 1, 'Business', 300.00),
+(2, 1, 'Economique', 200.00),
+(2, 1, 'Business', 400.00),
+(3, 1, 'Economique', 250.00),
+(3, 1, 'Business', 500.00),
+
+-- Lufthansa vols
+(6, 2, 'Economique', 160.00),
+(6, 2, 'Business', 320.00),
+(7, 2, 'Economique', 210.00),
+(7, 2, 'Business', 420.00),
+
+-- Emirates vols
+(6, 3, 'Economique', 180.00),
+(6, 3, 'Business', 360.00),
+(7, 3, 'Economique', 220.00),
+(7, 3, 'Business', 440.00);

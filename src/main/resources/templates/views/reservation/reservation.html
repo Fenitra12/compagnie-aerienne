@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réservations | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="ui/menu :: menu"></div>
+
+    <main class="main-area">
+        <header class="main-header">
+            <div>
+                <p class="eyebrow">Fenitra ETU003660</p>
+                <h1>Gestion des réservations</h1>
+            </div>
+            <div class="user-chip">
+                <span class="status-dot"></span>
+                <span>Module Réservations</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <article class="card">
+                <div class="card-header">
+                    <h2 class="section-title">Liste des réservations</h2>
+                    <a href="/reservations/add" class="btn-primary">Ajouter une réservation</a>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Passager</th>
+                            <th>Vol</th>
+                            <th>Classe</th>
+                            <th>Prix</th>
+                            <th>Siège</th>
+                            <th>Statut</th>
+                            <th>Date réservation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="reservation : ${reservations}">
+                            <td th:text="${reservation.idReservation}"></td>
+                            <td th:text="${reservation.passager.nom + ' ' + reservation.passager.prenom}"></td>
+                            <td th:text="${reservation.prixVol.vol.idVol + ' - ' + reservation.prixVol.vol.aeroportDepart.nom + ' -> ' + reservation.prixVol.vol.aeroportArrivee.nom}"></td>
+                            <td th:text="${reservation.prixVol.classe}"></td>
+                            <td th:text="${reservation.prixVol.prix + ' €'}"></td>
+                            <td th:text="${reservation.siege}"></td>
+                            <td th:text="${reservation.statut}"></td>
+                            <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy HH:mm')}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </article>
+        </section>
+
+        <footer class="main-footer">
+            <span>© 2026 Compagnie aérienne</span>
+            <span>Interface conçue pour ETU003660</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>
