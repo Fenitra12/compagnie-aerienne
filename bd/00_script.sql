@@ -54,6 +54,9 @@ CREATE TABLE Vol (
     id_aeroport_arrivee INT NOT NULL,
     date_depart TIMESTAMP NOT NULL,
     date_arrivee TIMESTAMP NOT NULL,
+    -- Snapshot of seating for business-side capacity control
+    seats_total INT NOT NULL DEFAULT 0,
+    seats_available INT NOT NULL DEFAULT 0,
     id_statut INT DEFAULT 1,
     FOREIGN KEY (id_avion) REFERENCES Avion(id_avion),
     FOREIGN KEY (id_aeroport_depart) REFERENCES Aeroport(id_aeroport),
@@ -65,13 +68,12 @@ CREATE TABLE Vol (
 CREATE TABLE PrixVol (
     id_prix SERIAL PRIMARY KEY,
     id_vol INT NOT NULL,
-    id_compagnie INT NOT NULL,
     classe VARCHAR(20) NOT NULL,
     prix NUMERIC(10,2) NOT NULL,
     date_maj TIMESTAMP DEFAULT NOW(),
     FOREIGN KEY (id_vol) REFERENCES Vol(id_vol),
-    FOREIGN KEY (id_compagnie) REFERENCES Compagnie(id_compagnie),
-    UNIQUE (id_vol, id_compagnie, classe)
+    -- id_compagnie removed to avoid redundancy (compagnie can be inferred via Vol->Avion->Compagnie)
+    UNIQUE (id_vol, classe)
 );
 
 -- Table Pilote
@@ -102,8 +104,7 @@ CREATE TABLE Reservation (
     date_reservation TIMESTAMP DEFAULT NOW(),
     siege VARCHAR(5),
     statut VARCHAR(20) DEFAULT 'confirmée',
-    id_vol INT NOT NULL,
-    FOREIGN KEY (id_vol) REFERENCES Vol(id_vol),
+    -- id_vol removed: reservation is linked to a flight through PrixVol -> Vol
     FOREIGN KEY (id_passager) REFERENCES Passager(id_passager),
     FOREIGN KEY (id_prix_vol) REFERENCES PrixVol(id_prix),
     UNIQUE (id_passager, id_prix_vol)

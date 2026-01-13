@@ -1,12 +1,12 @@
 package com.aerienne.gestion.service.vol;
 
-import com.aerienne.gestion.model.vol.Vol;
-import com.aerienne.gestion.repository.vol.VolRepository;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.aerienne.gestion.model.vol.Vol;
+import com.aerienne.gestion.repository.vol.VolRepository;
 
 @Service
 public class VolService {
@@ -19,6 +19,11 @@ public class VolService {
     }
 
     public Vol saveVol(Vol vol) {
+        if (vol.getIdVol() == null) {
+            // Nouveau vol : initialiser les sièges
+            vol.setSeatsTotal(vol.getAvion().getCapacite());
+            vol.setSeatsAvailable(vol.getAvion().getCapacite());
+        }
         return volRepository.save(vol);
     }
 

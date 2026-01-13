@@ -1,10 +1,18 @@
 package com.aerienne.gestion.model.vol;
 
-import com.aerienne.gestion.model.avions.Avion;
-import com.aerienne.gestion.model.aeroports.Aeroport;
-import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
+
+import com.aerienne.gestion.model.aeroports.Aeroport;
+import com.aerienne.gestion.model.avions.Avion;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Vol")
@@ -32,6 +40,12 @@ public class Vol {
     @ManyToOne
     @JoinColumn(name = "id_statut", nullable = false)
     private StatutVol statut;
+
+    @Column(name = "seats_total", nullable = false)
+    private Integer seatsTotal;
+
+    @Column(name = "seats_available", nullable = false)
+    private Integer seatsAvailable;
 
     // Getters and Setters
     public Long getIdVol() {
@@ -88,5 +102,21 @@ public class Vol {
 
     public void setStatut(StatutVol statut) {
         this.statut = statut;
+    }
+
+    public Integer getSeatsTotal() {
+        return seatsTotal;
+    }
+
+    public void setSeatsTotal(Integer seatsTotal) {
+        this.seatsTotal = seatsTotal;
+    }
+
+    public Integer getSeatsAvailable() {
+        return seatsAvailable;
+    }
+
+    public void setSeatsAvailable(Integer seatsAvailable) {
+        this.seatsAvailable = seatsAvailable;
     }
 }
