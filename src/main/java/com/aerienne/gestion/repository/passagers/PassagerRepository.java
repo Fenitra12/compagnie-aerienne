@@ -7,4 +7,5 @@ import com.aerienne.gestion.model.passagers.Passager;
 
 @Repository
 public interface PassagerRepository extends JpaRepository<Passager, Long> {
+	Passager findByEmail(String email);
 }

@@ -65,7 +65,7 @@ CREATE TABLE Vol (
 );
 
 -- Nouvelle table PrixVol (avant Reservation pour éviter l'erreur)
-CREATE TABLE PrixVol (
+CREATE TABLE prix_vol (
     id_prix SERIAL PRIMARY KEY,
     id_vol INT NOT NULL,
     classe VARCHAR(20) NOT NULL,
@@ -106,7 +106,7 @@ CREATE TABLE Reservation (
     statut VARCHAR(20) DEFAULT 'confirmée',
     -- id_vol removed: reservation is linked to a flight through PrixVol -> Vol
     FOREIGN KEY (id_passager) REFERENCES Passager(id_passager),
-    FOREIGN KEY (id_prix_vol) REFERENCES PrixVol(id_prix),
+    FOREIGN KEY (id_prix_vol) REFERENCES prix_vol(id_prix),
     UNIQUE (id_passager, id_prix_vol)
 );
 
@@ -169,16 +169,48 @@ INSERT INTO StatutVol (nom) VALUES
 ('EN_COURS'),
 ('TERMINE');
 
-INSERT INTO Vol (id_avion, id_aeroport_depart, id_aeroport_arrivee, date_depart, date_arrivee, id_statut) VALUES
+INSERT INTO Vol (id_avion, id_aeroport_depart, id_aeroport_arrivee, date_depart, date_arrivee, seats_total, seats_available, id_statut) VALUES
 -- Air France vols
-(1, 1, 2, '2026-01-10 08:00:00', '2026-01-10 10:30:00', 1),
-(2, 1, 4, '2026-01-11 14:00:00', '2026-01-11 22:00:00', 1),
-(3, 1, 5, '2026-01-12 20:00:00', '2026-01-13 08:00:00', 1),
+(1, 1, 2, '2026-01-10 08:00:00', '2026-01-10 10:30:00', 180, 180, 1),
+(2, 1, 4, '2026-01-11 14:00:00', '2026-01-11 22:00:00', 250, 250, 1),
+(3, 1, 5, '2026-01-12 20:00:00', '2026-01-13 08:00:00', 300, 300, 1),
 
 -- Lufthansa vols
-(6, 3, 1, '2026-01-10 12:00:00', '2026-01-10 14:30:00', 1),
-(7, 3, 4, '2026-01-11 16:00:00', '2026-01-12 00:00:00', 1),
+(6, 3, 1, '2026-01-10 12:00:00', '2026-01-10 14:30:00', 180, 180, 1),
+(7, 3, 4, '2026-01-11 16:00:00', '2026-01-12 00:00:00', 300, 300, 1),
 
 -- Emirates vols
-(11, 4, 2, '2026-01-10 18:00:00', '2026-01-11 06:00:00', 1),
-(12, 4, 5, '2026-01-12 22:00:00', '2026-01-13 10:00:00', 1);
+(11, 4, 2, '2026-01-10 18:00:00', '2026-01-11 06:00:00', 500, 500, 1),
+(12, 4, 5, '2026-01-12 22:00:00', '2026-01-13 10:00:00', 350, 350, 1);
+
+INSERT INTO prix_vol (id_vol, classe, prix) VALUES
+-- Vol 1: Air France CDG -> LHR
+(1, 'Economy', 150.00),
+(1, 'Business', 300.00),
+(1, 'First', 500.00),
+
+-- Vol 2: Air France CDG -> DXB
+(2, 'Economy', 400.00),
+(2, 'Business', 800.00),
+(2, 'First', 1200.00),
+
+-- Vol 3: Air France CDG -> JFK
+(3, 'Economy', 600.00),
+(3, 'Business', 1200.00),
+(3, 'First', 2000.00),
+
+-- Vol 4: Lufthansa FRA -> CDG
+(4, 'Economy', 100.00),
+(4, 'Business', 200.00),
+
+-- Vol 5: Lufthansa FRA -> DXB
+(5, 'Economy', 350.00),
+(5, 'Business', 700.00),
+
+-- Vol 6: Emirates DXB -> LHR
+(6, 'Economy', 250.00),
+(6, 'Business', 500.00),
+
+-- Vol 7: Emirates DXB -> JFK
+(7, 'Economy', 550.00),
+(7, 'Business', 1100.00);

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.aerienne.gestion.model.vol.Vol;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,20 +15,26 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "PrixVol",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"id_vol", "classe"}))
+@Table(name = "prix_vol",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"id_vol", "classe"}))
 public class PrixVol {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_prix")
     private Long idPrix;
 
     @ManyToOne
     @JoinColumn(name = "id_vol", nullable = false)
     private Vol vol;
 
+    @Column(name = "classe")
     private String classe;
+
+    @Column(name = "prix")
     private Double prix;
+
+    @Column(name = "date_maj")
     private LocalDateTime dateMaj;
 
     // getters & setters
