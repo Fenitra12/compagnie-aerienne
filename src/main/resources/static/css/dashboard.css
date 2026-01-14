@@ -246,11 +246,11 @@ a {
     font-weight: 500;
     letter-spacing: 0.1rem;
     text-transform: uppercase;
-    padding-bottom: 14px;
+    padding: 14px 10px 14px 0;
 }
 
 .data-table tbody td {
-    padding: 14px 0;
+    padding: 14px 10px 14px 0;
     border-top: 1px solid var(--border-soft);
 }
 

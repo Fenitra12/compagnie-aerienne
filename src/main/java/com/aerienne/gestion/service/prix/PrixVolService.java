@@ -29,4 +29,8 @@ public class PrixVolService {
     public PrixVol getPrixVolById(Long id) {
         return prixVolRepository.findById(id).orElse(null);
     }
+
+    public List<PrixVol> findByVolId(Long volId) {
+        return prixVolRepository.findByVol_IdVol(volId);
+    }
 }

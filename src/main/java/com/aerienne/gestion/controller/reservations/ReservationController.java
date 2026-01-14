@@ -1,5 +1,6 @@
 package com.aerienne.gestion.controller.reservations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import com.aerienne.gestion.model.passagers.Passager;
+import com.aerienne.gestion.model.prix.PrixVol;
 import com.aerienne.gestion.model.reservations.Reservation;
 import com.aerienne.gestion.service.passagers.PassagerService;
 import com.aerienne.gestion.service.prix.PrixVolService;
@@ -38,20 +40,42 @@ public class ReservationController {
     }
 
     @GetMapping("/add")
-    public String showAddForm(Model model) {
+    public String showAddForm(@RequestParam(required = false) Long volId, Model model) {
         model.addAttribute("reservation", new Reservation());
-        model.addAttribute("passagers", passagerService.getAllPassagers());
-        model.addAttribute("prixVols", prixVolService.getAllPrixVols());
+        List<PrixVol> prixVols = new ArrayList<>();
+        if (volId != null) {
+            prixVols = prixVolService.findByVolId(volId);
+        }
+        System.out.println("volId: " + volId + ", prixVols size: " + prixVols.size());
+        model.addAttribute("prixVols", prixVols);
         return "views/reservation/add";
     }
 
     @PostMapping("/add")
-    public String addReservation(@ModelAttribute Reservation reservation, @ModelAttribute Passager passager) {
-        // Sauvegarder le passager si nouveau
-        if (passager.getIdPassager() == null) {
-            passagerService.savePassager(passager);
+    public String addReservation(@ModelAttribute Reservation reservation) {
+        // Charger le PrixVol complet pour obtenir le Vol associé
+        if (reservation.getPrixVol() != null && reservation.getPrixVol().getIdPrix() != null) {
+            var prixVol = prixVolService.getPrixVolById(reservation.getPrixVol().getIdPrix());
+            reservation.setPrixVol(prixVol);
         }
-        reservation.setPassager(passager);
+
+        // Réutiliser le passager par email s'il existe, sinon le créer
+        if (reservation.getPassager() != null) {
+            var p = reservation.getPassager();
+            if (p.getEmail() != null && !p.getEmail().isBlank()) {
+                var existing = passagerService.getByEmail(p.getEmail());
+                if (existing != null) {
+                    reservation.setPassager(existing);
+                } else if (p.getIdPassager() == null) {
+                    var saved = passagerService.savePassager(p);
+                    reservation.setPassager(saved);
+                }
+            } else if (p.getIdPassager() == null) {
+                var saved = passagerService.savePassager(p);
+                reservation.setPassager(saved);
+            }
+        }
+
         reservationService.saveReservation(reservation);
         return "redirect:/reservations";
     }
