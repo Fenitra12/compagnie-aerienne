@@ -106,8 +106,7 @@ CREATE TABLE Reservation (
     statut VARCHAR(20) DEFAULT 'confirmée',
     -- id_vol removed: reservation is linked to a flight through PrixVol -> Vol
     FOREIGN KEY (id_passager) REFERENCES Passager(id_passager),
-    FOREIGN KEY (id_prix_vol) REFERENCES prix_vol(id_prix),
-    UNIQUE (id_passager, id_prix_vol)
+    FOREIGN KEY (id_prix_vol) REFERENCES prix_vol(id_prix)
 );
 
 -- Table Equipage (N-M Vol <-> Pilote)

@@ -12,11 +12,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "reservation",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"id_passager", "id_prix_vol"}))
+@Table(name = "reservation")
 public class Reservation {
 
     @Id
