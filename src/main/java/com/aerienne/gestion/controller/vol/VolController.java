@@ -1,9 +1,12 @@
 package com.aerienne.gestion.controller.vol;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.aerienne.gestion.model.vol.Vol;
 import com.aerienne.gestion.service.aeroports.AeroportService;
 import com.aerienne.gestion.service.avions.AvionService;
+import com.aerienne.gestion.service.compagnies.CompagnieService;
+import com.aerienne.gestion.service.reservations.ReservationService;
 import com.aerienne.gestion.service.vol.StatutVolService;
 import com.aerienne.gestion.service.vol.VolService;
 
@@ -34,6 +39,12 @@ public class VolController {
 
     @Autowired
     private StatutVolService statutVolService;
+
+    @Autowired
+    private ReservationService reservationService;
+
+    @Autowired
+    private CompagnieService compagnieService;
 
     @GetMapping("/vol")
     public String listVols(@RequestParam(required = false) String depart,
@@ -113,5 +124,43 @@ public class VolController {
 
         volService.deleteVol(id);
         return "redirect:/vol";
+    }
+
+    @GetMapping("/vol/stats")
+    public String showVolStats(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                               @RequestParam(required = false) Long departId,
+                               @RequestParam(required = false) Long arriveeId,
+                               @RequestParam(required = false) Long compagnieId,
+                               Model model,
+                               HttpSession session) {
+        if (session.getAttribute("username") == null) {
+            return "redirect:/login";
+        }
+
+        var stats = reservationService.getVolRevenue(startDate, endDate, departId, arriveeId, compagnieId);
+        var topVol = stats.isEmpty() ? null : stats.get(0);
+
+        List<String> labels = new ArrayList<>();
+        List<Double> revenues = new ArrayList<>();
+        stats.forEach(s -> {
+            labels.add(s.getVol().getAeroportDepart().getCodeIata() + " -> " + s.getVol().getAeroportArrivee().getCodeIata());
+            revenues.add(s.getRevenue());
+        });
+
+        model.addAttribute("stats", stats);
+        model.addAttribute("topVol", topVol);
+        model.addAttribute("chartLabels", labels);
+        model.addAttribute("chartRevenues", revenues);
+        model.addAttribute("aeroports", aeroportService.getAllAeroports());
+        model.addAttribute("compagnies", compagnieService.getAllCompagnies());
+
+        model.addAttribute("selectedStart", startDate);
+        model.addAttribute("selectedEnd", endDate);
+        model.addAttribute("selectedDepart", departId);
+        model.addAttribute("selectedArrivee", arriveeId);
+        model.addAttribute("selectedCompagnie", compagnieId);
+
+        return "views/vol/stats";
     }
 }
