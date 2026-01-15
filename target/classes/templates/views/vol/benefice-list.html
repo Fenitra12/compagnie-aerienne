@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bénéfices vols | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="ui/menu :: menu"></div>
+
+    <main class="main-area">
+        <header class="main-header">
+            <div>
+                <p class="eyebrow">Fenitra ETU003660</p>
+                <h1>Bénéfices max par vol</h1>
+            </div>
+            <div class="user-chip">
+                <span class="status-dot"></span>
+                <span>Module Bénéfices</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <article class="card">
+                <p class="badge">Filtres</p>
+                <h2 class="section-title">Recherche de vols</h2>
+                <p class="module-description">Filtre identique à la liste des vols</p>
+                <form th:action="@{/vol/benefice}" method="get" class="search-form" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+                    <div class="form-group">
+                        <label for="departId">Aéroport de départ</label>
+                        <select id="departId" name="departId">
+                            <option th:value="${null}" th:selected="${selectedDepartId == null}">Tous</option>
+                            <option th:each="a : ${aeroports}" th:value="${a.idAeroport}" th:text="${a.nom} + ' (' + ${a.codeIata} + ')'" th:selected="${selectedDepartId == a.idAeroport}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="arriveeId">Aéroport d'arrivée</label>
+                        <select id="arriveeId" name="arriveeId">
+                            <option th:value="${null}" th:selected="${selectedArriveeId == null}">Tous</option>
+                            <option th:each="a : ${aeroports}" th:value="${a.idAeroport}" th:text="${a.nom} + ' (' + ${a.codeIata} + ')'" th:selected="${selectedArriveeId == a.idAeroport}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="align-self: end;">
+                        <button type="submit" class="btn-primary">Rechercher</button>
+                        <a href="/vol/benefice" class="btn-secondary" style="margin-left: 8px;">Réinitialiser</a>
+                    </div>
+                </form>
+            </article>
+        </section>
+
+        <section class="table-wrapper">
+            <header>
+                <div>
+                    <p class="badge">Liste</p>
+                    <h2 class="section-title">Vols éligibles</h2>
+                </div>
+                <div>
+                    <a href="/vol" class="btn-secondary" style="margin-right: 8px;">Retour liste vols</a>
+                </div>
+            </header>
+            <div class="table-responsive" style="overflow-x: scroll; overflow-y: scroll; height: 420px;">
+                <table class="data-table" style="min-width: 1200px;">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Avion</th>
+                        <th>Départ</th>
+                        <th>Arrivée</th>
+                        <th>Date départ</th>
+                        <th>Date arrivée</th>
+                        <th>Places disponibles</th>
+                        <th>Statut</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="vol : ${vols}">
+                        <td th:text="${vol.idVol}"></td>
+                        <td th:text="${vol.avion.modele} + ' (' + ${vol.avion.numeroImmatriculation} + ')'"></td>
+                        <td th:text="${vol.aeroportDepart.nom} + ' (' + ${vol.aeroportDepart.codeIata} + ')'"></td>
+                        <td th:text="${vol.aeroportArrivee.nom} + ' (' + ${vol.aeroportArrivee.codeIata} + ')'"></td>
+                        <td th:text="${#temporals.format(vol.dateDepart, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${#temporals.format(vol.dateArrivee, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${vol.seatsAvailable} + '/' + ${vol.seatsTotal}"></td>
+                        <td th:text="${vol.statut != null ? vol.statut.nom : 'Non défini'}"></td>
+                        <td>
+                            <a th:href="@{/vol/benefice/{id}(id=${vol.idVol})}" class="btn-primary">Bénéfice max</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="main-footer">
+            <span>© 2026 Compagnie aérienne</span>
+            <span>Interface conçue pour ETU003660</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

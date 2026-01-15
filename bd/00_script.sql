@@ -55,6 +55,8 @@ CREATE TABLE Vol (
     date_depart TIMESTAMP NOT NULL,
     date_arrivee TIMESTAMP NOT NULL,
     -- Seats per class are stored in table Vol_Place_Classe (see below)
+    seats_total INT NOT NULL DEFAULT 0,
+    seats_available INT NOT NULL DEFAULT 0,
     id_statut INT DEFAULT 1,
     FOREIGN KEY (id_avion) REFERENCES Avion(id_avion),
     FOREIGN KEY (id_aeroport_depart) REFERENCES Aeroport(id_aeroport),
@@ -160,14 +162,19 @@ INSERT INTO Avion (id_compagnie, modele, capacite, numero_immatriculation) VALUE
 (3, 'Boeing 777', 350, 'A6-B77701'),
 (3, 'Boeing 787', 280, 'A6-B78701'),
 (3, 'Airbus A350', 300, 'A6-A35001'),
-(3, 'Boeing 737', 180, 'A6-B73701');
+(3, 'Boeing 737', 180, 'A6-B73701'),
+
+-- Air France (ajout pour TNR -> NOS)
+(1, 'Airbus A321', 200, 'F-A32199');
 
 INSERT INTO Aeroport (nom, ville, pays, code_iata, code_icao) VALUES
 ('Charles de Gaulle', 'Paris', 'France', 'CDG', 'LFPG'),
 ('Heathrow', 'London', 'United Kingdom', 'LHR', 'EGLL'),
 ('Frankfurt', 'Frankfurt', 'Germany', 'FRA', 'EDDF'),
 ('Dubai International', 'Dubai', 'United Arab Emirates', 'DXB', 'OMDB'),
-('John F. Kennedy', 'New York', 'United States', 'JFK', 'KJFK');
+('John F. Kennedy', 'New York', 'United States', 'JFK', 'KJFK'),
+('Ivato', 'Tananarive', 'Madagascar', 'TNR', 'FMMI'),
+('Fascene', 'Nosy Be', 'Madagascar', 'NOS', 'FMNN');
 
 INSERT INTO StatutVol (nom) VALUES
 ('PREVU'),
@@ -177,19 +184,24 @@ INSERT INTO StatutVol (nom) VALUES
 ('EN_COURS'),
 ('TERMINE');
 
-INSERT INTO Vol (id_avion, id_aeroport_depart, id_aeroport_arrivee, date_depart, date_arrivee, id_statut) VALUES
+INSERT INTO Vol (id_avion, id_aeroport_depart, id_aeroport_arrivee, date_depart, date_arrivee, seats_total, seats_available, id_statut) VALUES
 -- Air France vols
-(1, 1, 2, '2026-01-10 08:00:00', '2026-01-10 10:30:00', 1),
-(2, 1, 4, '2026-01-11 14:00:00', '2026-01-11 22:00:00', 1),
-(3, 1, 5, '2026-01-12 20:00:00', '2026-01-13 08:00:00', 1),
+
+(1, 1, 2, '2026-01-10 08:00:00', '2026-01-10 10:30:00', 180, 180, 1),
+(2, 1, 4, '2026-01-11 14:00:00', '2026-01-11 22:00:00', 250, 250, 1),
+(3, 1, 5, '2026-01-12 20:00:00', '2026-01-13 08:00:00', 300, 300, 1),
 
 -- Lufthansa vols
-(6, 3, 1, '2026-01-10 12:00:00', '2026-01-10 14:30:00', 1),
-(7, 3, 4, '2026-01-11 16:00:00', '2026-01-12 00:00:00', 1),
+
+(6, 3, 1, '2026-01-10 12:00:00', '2026-01-10 14:30:00', 180, 180, 1),
+(7, 3, 4, '2026-01-11 16:00:00', '2026-01-12 00:00:00', 300, 300, 1),
 
 -- Emirates vols
-(11, 4, 2, '2026-01-10 18:00:00', '2026-01-11 06:00:00', 1),
-(12, 4, 5, '2026-01-12 22:00:00', '2026-01-13 10:00:00', 1);
+(11, 4, 2, '2026-01-10 18:00:00', '2026-01-11 06:00:00', 500, 500, 1),
+(12, 4, 5, '2026-01-12 22:00:00', '2026-01-13 10:00:00', 350, 350, 1),
+
+-- Air France vols (nouveau) TNR -> NOS
+(16, 6, 7, '2026-02-10 09:00:00', '2026-02-10 11:00:00', 200, 200, 1);
 
 INSERT INTO prix_vol (id_vol, classe, prix) VALUES
 -- Vol 1: Air France CDG -> LHR
@@ -221,7 +233,11 @@ INSERT INTO prix_vol (id_vol, classe, prix) VALUES
 
 -- Vol 7: Emirates DXB -> JFK
 (7, 'Economy', 550.00),
-(7, 'Business', 1100.00);
+(7, 'Business', 1100.00),
+
+-- Vol 8: Air France TNR -> NOS
+(8, 'Economy', 700000.00),
+(8, 'First', 1200000.00);
 
 -- Données de test: répartition des places par classe (seats_total = seats_available initialement)
 INSERT INTO Vol_Place_Classe (id_vol, classe, seats_total, seats_available) VALUES
@@ -254,7 +270,11 @@ INSERT INTO Vol_Place_Classe (id_vol, classe, seats_total, seats_available) VALU
 
 -- Vol 7 (capacité 350) - pas de First dans prix_vol
 (7, 'Economy', 280, 280),
-(7, 'Business', 70, 70);
+(7, 'Business', 70, 70),
+
+-- Vol 8 (capacité 200) TNR -> NOS
+(8, 'Economy', 170, 170),
+(8, 'First', 30, 30);
 
 -- Quelques passagers de test
 INSERT INTO Passager (nom, prenom, date_naissance, email) VALUES
@@ -282,6 +302,3 @@ JOIN Vol_Place_Classe vpc ON vpc.id_vol = v.id_vol
 JOIN prix_vol pv ON pv.id_vol = v.id_vol AND pv.classe = vpc.classe
 WHERE v.id_vol = 1
 GROUP BY v.id_vol;
-
-ALTER TABLE vol ADD COLUMN IF NOT EXISTS seats_total INTEGER DEFAULT 0;
-ALTER TABLE vol ADD COLUMN IF NOT EXISTS seats_available INTEGER DEFAULT 0;
