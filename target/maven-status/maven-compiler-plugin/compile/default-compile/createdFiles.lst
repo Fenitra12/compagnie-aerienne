@@ -15,6 +15,7 @@ com\aerienne\gestion\controller\login\LoginController.class
 com\aerienne\gestion\repository\vol\StatutVolRepository.class
 com\aerienne\gestion\model\pilotes\Pilote.class
 com\aerienne\gestion\repository\reservations\ReservationRepository.class
+com\aerienne\gestion\model\vol\VolPlaceClasse.class
 com\aerienne\gestion\repository\prix\PrixVolRepository.class
 com\aerienne\gestion\model\prix\PrixVol.class
 com\aerienne\gestion\model\passagers\Passager.class
