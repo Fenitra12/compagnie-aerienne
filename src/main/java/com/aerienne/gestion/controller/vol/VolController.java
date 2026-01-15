@@ -3,6 +3,7 @@ package com.aerienne.gestion.controller.vol;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.aerienne.gestion.model.prix.PrixVol;
 import com.aerienne.gestion.model.vol.Vol;
+import com.aerienne.gestion.model.vol.VolPlaceClasse;
 import com.aerienne.gestion.service.aeroports.AeroportService;
 import com.aerienne.gestion.service.avions.AvionService;
 import com.aerienne.gestion.service.compagnies.CompagnieService;
@@ -129,12 +132,16 @@ public class VolController {
     }
 
     @PostMapping("/vol/add")
-    public String addVol(@ModelAttribute Vol vol, HttpSession session) {
+    public String addVol(@ModelAttribute Vol vol, HttpSession session,
+                         @RequestParam(name = "classe", required = false) List<String> classes,
+                         @RequestParam(name = "seatsClasse", required = false) List<Integer> seatsClasse,
+                         @RequestParam(name = "prixClasse", required = false) List<Double> prixClasse) {
         if (session.getAttribute("username") == null) {
             return "redirect:/login";
         }
 
-        volService.saveVol(vol);
+        Vol saved = volService.saveVol(vol);
+        volService.replaceClassesAndPrices(saved, classes, seatsClasse, prixClasse);
         return "redirect:/vol";
     }
 
@@ -145,21 +152,32 @@ public class VolController {
         }
 
         Vol vol = volService.getVolById(id);
+        List<VolPlaceClasse> classes = volService.getClasses(id);
+        List<PrixVol> prix = volService.getPrixByVol(id);
+        Map<String, Double> prixMap = prix.stream()
+            .collect(Collectors.toMap(PrixVol::getClasse, PrixVol::getPrix, (a, b) -> a));
         model.addAttribute("vol", vol);
         model.addAttribute("avions", avionService.getAllAvions());
         model.addAttribute("aeroports", aeroportService.getAllAeroports());
         model.addAttribute("statuts", statutVolService.getAllStatuts());
+        model.addAttribute("classes", classes);
+        model.addAttribute("prix", prix);
+        model.addAttribute("prixMap", prixMap);
         return "views/vol/edit";
     }
 
     @PostMapping("/vol/edit/{id}")
-    public String editVol(@PathVariable Long id, @ModelAttribute Vol vol, HttpSession session) {
+    public String editVol(@PathVariable Long id, @ModelAttribute Vol vol, HttpSession session,
+                          @RequestParam(name = "classe", required = false) List<String> classes,
+                          @RequestParam(name = "seatsClasse", required = false) List<Integer> seatsClasse,
+                          @RequestParam(name = "prixClasse", required = false) List<Double> prixClasse) {
         if (session.getAttribute("username") == null) {
             return "redirect:/login";
         }
 
         vol.setIdVol(id);
-        volService.saveVol(vol);
+        Vol saved = volService.saveVol(vol);
+        volService.replaceClassesAndPrices(saved, classes, seatsClasse, prixClasse);
         return "redirect:/vol";
     }
 

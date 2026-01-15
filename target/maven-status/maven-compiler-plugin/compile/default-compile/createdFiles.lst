@@ -5,6 +5,7 @@ com\aerienne\gestion\controller\prix\PrixVolController.class
 com\aerienne\gestion\model\aeroports\Aeroport.class
 com\aerienne\gestion\service\prix\PrixVolService.class
 com\aerienne\gestion\controller\avions\AvionController.class
+com\aerienne\gestion\repository\vol\VolRevenueView.class
 com\aerienne\gestion\model\reservations\Reservation.class
 com\aerienne\gestion\service\SimpleService.class
 com\aerienne\gestion\controller\SimpleController.class
@@ -14,6 +15,7 @@ com\aerienne\gestion\controller\login\LoginController.class
 com\aerienne\gestion\repository\vol\StatutVolRepository.class
 com\aerienne\gestion\model\pilotes\Pilote.class
 com\aerienne\gestion\repository\reservations\ReservationRepository.class
+com\aerienne\gestion\model\vol\VolPlaceClasse.class
 com\aerienne\gestion\repository\prix\PrixVolRepository.class
 com\aerienne\gestion\model\prix\PrixVol.class
 com\aerienne\gestion\model\passagers\Passager.class
@@ -35,7 +37,9 @@ com\aerienne\gestion\service\compagnies\CompagnieService.class
 com\aerienne\gestion\GestionApplication.class
 com\aerienne\gestion\model\SimpleEntity.class
 com\aerienne\gestion\service\avions\AvionService.class
+com\aerienne\gestion\repository\vol\VolPlaceClasseRepository.class
 com\aerienne\gestion\controller\vol\VolController.class
 com\aerienne\gestion\service\utilisateurs\UtilisateurService.class
 com\aerienne\gestion\model\avions\Avion.class
+com\aerienne\gestion\repository\vol\projection\VolClassRevenue.class
 com\aerienne\gestion\repository\aeroports\AeroportRepository.class

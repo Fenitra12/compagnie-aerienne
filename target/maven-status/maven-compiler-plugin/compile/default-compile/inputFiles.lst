@@ -19,6 +19,7 @@ D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\S
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\utilisateurs\Utilisateur.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\vol\StatutVol.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\vol\Vol.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\vol\VolPlaceClasse.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\aeroports\AeroportRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\avions\AvionRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\compagnies\CompagnieRepository.java
@@ -29,6 +30,7 @@ D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\reposit
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\utilisateurs\UtilisateurRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\vol\projection\VolClassRevenue.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\vol\StatutVolRepository.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\vol\VolPlaceClasseRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\vol\VolRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\vol\VolRevenueView.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\aeroports\AeroportService.java
