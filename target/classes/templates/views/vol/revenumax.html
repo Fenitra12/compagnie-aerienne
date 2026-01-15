@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenu Maximal par Vol | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <style>
+        .data-table td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-shell">
+        <div th:replace="ui/menu :: menu"></div>
+
+        <main class="main-area">
+            <header class="main-header">
+                <div>
+                    <p class="eyebrow">Fenitra ETU003660</p>
+                    <h1>Revenus maximaux par vol</h1>
+                </div>
+                <div class="user-chip">
+                    <span class="status-dot"></span>
+                    <span>Module Vols</span>
+                </div>
+            </header>
+
+            <section class="table-wrapper">
+                <header>
+                    <div>
+                        <p class="badge">Analyse</p>
+                        <h2 class="section-title">Chiffre d'affaires maximal</h2>
+                    </div>
+                    <div>
+                        <a href="/vol" class="btn-secondary">Retour aux vols</a>
+                    </div>
+                </header>
+
+                <!-- Formulaire de filtrage -->
+                <section class="search-section">
+                    <form th:action="@{/maxvalue}" method="get" class="search-form">
+                        <div class="form-group">
+                            <label for="depart">Aéroport de départ</label>
+                            <select id="depart" name="depart" class="form-control">
+                                <option value="">-- Sélectionner --</option>
+                                <option th:each="aeroport : ${aeroports}" th:value="${aeroport.idAeroport}"
+                                    th:text="${aeroport.nom} + ' (' + ${aeroport.codeIata} + ')'"
+                                    th:selected="${depart != null and depart == aeroport.idAeroport}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="arrivee">Aéroport d'arrivée</label>
+                            <select id="arrivee" name="arrivee" class="form-control">
+                                <option value="">-- Sélectionner --</option>
+                                <option th:each="aeroport : ${aeroports}" th:value="${aeroport.idAeroport}"
+                                    th:text="${aeroport.nom} + ' (' + ${aeroport.codeIata} + ')'"
+                                    th:selected="${arrivee != null and arrivee == aeroport.idAeroport}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Filtrer</button>
+                    </form>
+                </section>
+
+                <!-- Tableau des résultats -->
+                <div th:if="${#lists.isEmpty(maxRevenuVols)}" class="alert alert-info"
+                    style="padding: 20px; margin: 20px; background-color: #e3f2fd; border-left: 4px solid #2196F3;">
+                    Aucun vol trouvé pour les critères sélectionnés.
+                </div>
+
+                <div th:if="${not #lists.isEmpty(maxRevenuVols)}" class="table-responsive"
+                    style="overflow-x: scroll; overflow-y: scroll; height: 400px;">
+                    <table class="data-table" style="min-width: 1200px;">
+                        <thead>
+                            <tr>
+                                <th>ID Vol</th>
+                                <th>Aéroport Départ</th>
+                                <th>Aéroport Arrivée</th>
+                                <th>Avion</th>
+                                <th>Classe</th>
+                                <th>Sièges</th>
+                                <th>Prix/Siège (Ar)</th>
+                                <th>CA Classe (Ar)</th>
+                                <th>CA Total Vol (Ar)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item, stat : ${maxRevenuVols}">
+                                <td th:text="${item.idVol}"></td>
+                                <td th:text="${item.depart}"></td>
+                                <td th:text="${item.arrivee}"></td>
+                                <td th:text="${item.modele}"></td>
+                                <td th:text="${item.classe != null ? item.classe : '--'}"></td>
+                                <td th:text="${item.seatsTotal != null ? item.seatsTotal : '--'}"></td>
+                                <td th:text="${item.prix != null ? #numbers.formatDecimal(item.prix, 1, 0) : '--'}">
+                                </td>
+                                <td
+                                    th:text="${item.caClasse != null ? #numbers.formatDecimal(item.caClasse, 1, 0) : '--'}">
+                                </td>
+                                <td th:text="${stat.index == 0 
+                                    or maxRevenuVols[stat.index - 1].idVol != item.idVol 
+                                    ? #numbers.formatDecimal(item.caMaximal, 1, 0) 
+                                    : ''}" th:style="${stat.index > 0 
+                                    and maxRevenuVols[stat.index - 1].idVol == item.idVol 
+                                    ? 'border-top: none;' 
+                                    : 'font-weight:bold; text-align:center; vertical-align: middle;'}">
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <footer class="main-footer">
+                <span>© 2026 Compagnie aérienne</span>
+                <span>Interface conçue pour ETU003660</span>
+            </footer>
+        </main>
+    </div>
+</body>
+
+</html>
