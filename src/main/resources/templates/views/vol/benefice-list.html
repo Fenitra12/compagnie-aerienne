@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vols | Compagnie aérienne</title>
+    <title>Bénéfices vols | Compagnie aérienne</title>
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 <body>
@@ -14,37 +14,20 @@
         <header class="main-header">
             <div>
                 <p class="eyebrow">Fenitra ETU003660</p>
-                <h1>Vols programmés</h1>
+                <h1>Bénéfices max par vol</h1>
             </div>
             <div class="user-chip">
                 <span class="status-dot"></span>
-                <span>Module Vols</span>
+                <span>Module Bénéfices</span>
             </div>
         </header>
 
         <section class="content-section">
             <article class="card">
-                <p class="badge">Inventaire</p>
-                <h2 class="section-title">Vue d'ensemble</h2>
-                <p class="module-description">Nombre de vols programmés</p>
-                <h3 th:text="${vols == null ? '0 vol' : vols.size() + ' vols'}"></h3>
-            </article>
-        </section>
-
-        <section class="table-wrapper">
-            <header>
-                <div>
-                    <p class="badge">Liste</p>
-                    <h2 class="section-title">Vols référencés</h2>
-                </div>
-                <div>
-                    <a href="/vol/benefice" class="btn-secondary" style="margin-right: 8px;">Bénéfices</a>
-                    <a href="/vol/stats" class="btn-secondary" style="margin-right: 8px;">Statistiques</a>
-                    <a href="/vol/add" class="btn-primary">Ajouter</a>
-                </div>
-            </header>
-            <section class="search-section">
-                <form th:action="@{/vol}" method="get" class="search-form" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+                <p class="badge">Filtres</p>
+                <h2 class="section-title">Recherche de vols</h2>
+                <p class="module-description">Filtre identique à la liste des vols</p>
+                <form th:action="@{/vol/benefice}" method="get" class="search-form" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
                     <div class="form-group">
                         <label for="departId">Aéroport de départ</label>
                         <select id="departId" name="departId">
@@ -61,11 +44,23 @@
                     </div>
                     <div class="form-group" style="align-self: end;">
                         <button type="submit" class="btn-primary">Rechercher</button>
-                        <a href="/vol" class="btn-secondary" style="margin-left: 8px;">Réinitialiser</a>
+                        <a href="/vol/benefice" class="btn-secondary" style="margin-left: 8px;">Réinitialiser</a>
                     </div>
                 </form>
-            </section>
-            <div class="table-responsive" style="overflow-x: scroll; overflow-y: scroll; height: 400px;">
+            </article>
+        </section>
+
+        <section class="table-wrapper">
+            <header>
+                <div>
+                    <p class="badge">Liste</p>
+                    <h2 class="section-title">Vols éligibles</h2>
+                </div>
+                <div>
+                    <a href="/vol" class="btn-secondary" style="margin-right: 8px;">Retour liste vols</a>
+                </div>
+            </header>
+            <div class="table-responsive" style="overflow-x: scroll; overflow-y: scroll; height: 420px;">
                 <table class="data-table" style="min-width: 1200px;">
                     <thead>
                     <tr>
@@ -73,11 +68,11 @@
                         <th>Avion</th>
                         <th>Départ</th>
                         <th>Arrivée</th>
-                        <th>Date Départ</th>
-                        <th>Date Arrivée</th>
+                        <th>Date départ</th>
+                        <th>Date arrivée</th>
                         <th>Places disponibles</th>
                         <th>Statut</th>
-                        <th>Actions</th>
+                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -91,9 +86,7 @@
                         <td th:text="${vol.seatsAvailable} + '/' + ${vol.seatsTotal}"></td>
                         <td th:text="${vol.statut != null ? vol.statut.nom : 'Non défini'}"></td>
                         <td>
-                            <a th:href="@{/reservations/add?volId={id}(id=${vol.idVol})}" class="btn-primary">Réserver</a>
-                            <a th:href="@{/vol/edit/{id}(id=${vol.idVol})}" class="btn-edit">Modifier</a>
-                            <a th:href="@{/vol/delete/{id}(id=${vol.idVol})}" class="btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce vol ?')">Supprimer</a>
+                            <a th:href="@{/vol/benefice/{id}(id=${vol.idVol})}" class="btn-primary">Bénéfice max</a>
                         </td>
                     </tr>
                     </tbody>

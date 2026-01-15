@@ -46,25 +46,72 @@ public class VolController {
     @Autowired
     private CompagnieService compagnieService;
 
+    @GetMapping("/vol/benefice")
+    public String listVolsBenefice(@RequestParam(required = false) String depart,
+                                   @RequestParam(required = false) String arrivee,
+                                   @RequestParam(required = false) Long departId,
+                                   @RequestParam(required = false) Long arriveeId,
+                                   Model model, HttpSession session) {
+        if (session.getAttribute("username") == null) {
+            return "redirect:/login";
+        }
+
+        List<Vol> vols = volService.getAllVols();
+        if (departId != null) {
+            vols = vols.stream().filter(v -> v.getAeroportDepart().getIdAeroport().equals(departId)).collect(Collectors.toList());
+        } else if (depart != null && !depart.isEmpty()) {
+            String dep = depart.toLowerCase();
+            vols = vols.stream().filter(v -> v.getAeroportDepart().getNom().toLowerCase().contains(dep) ||
+                                              v.getAeroportDepart().getCodeIata().toLowerCase().contains(dep)).collect(Collectors.toList());
+        }
+        if (arriveeId != null) {
+            vols = vols.stream().filter(v -> v.getAeroportArrivee().getIdAeroport().equals(arriveeId)).collect(Collectors.toList());
+        } else if (arrivee != null && !arrivee.isEmpty()) {
+            String arr = arrivee.toLowerCase();
+            vols = vols.stream().filter(v -> v.getAeroportArrivee().getNom().toLowerCase().contains(arr) ||
+                                              v.getAeroportArrivee().getCodeIata().toLowerCase().contains(arr)).collect(Collectors.toList());
+        }
+
+        model.addAttribute("vols", vols);
+        model.addAttribute("aeroports", aeroportService.getAllAeroports());
+        model.addAttribute("selectedDepart", depart);
+        model.addAttribute("selectedArrivee", arrivee);
+        model.addAttribute("selectedDepartId", departId);
+        model.addAttribute("selectedArriveeId", arriveeId);
+        return "views/vol/benefice-list";
+    }
+
     @GetMapping("/vol")
     public String listVols(@RequestParam(required = false) String depart,
                            @RequestParam(required = false) String arrivee,
+                           @RequestParam(required = false) Long departId,
+                           @RequestParam(required = false) Long arriveeId,
                            Model model, HttpSession session) {
         if (session.getAttribute("username") == null) {
             return "redirect:/login";
         }
 
         List<Vol> vols = volService.getAllVols();
-        if (depart != null && !depart.isEmpty()) {
-            vols = vols.stream().filter(v -> v.getAeroportDepart().getNom().toLowerCase().contains(depart.toLowerCase()) ||
-                                              v.getAeroportDepart().getCodeIata().toLowerCase().contains(depart.toLowerCase())).collect(Collectors.toList());
+        if (departId != null) {
+            vols = vols.stream().filter(v -> v.getAeroportDepart().getIdAeroport().equals(departId)).collect(Collectors.toList());
+        } else if (depart != null && !depart.isEmpty()) {
+            String dep = depart.toLowerCase();
+            vols = vols.stream().filter(v -> v.getAeroportDepart().getNom().toLowerCase().contains(dep) ||
+                                              v.getAeroportDepart().getCodeIata().toLowerCase().contains(dep)).collect(Collectors.toList());
         }
-        if (arrivee != null && !arrivee.isEmpty()) {
-            vols = vols.stream().filter(v -> v.getAeroportArrivee().getNom().toLowerCase().contains(arrivee.toLowerCase()) ||
-                                              v.getAeroportArrivee().getCodeIata().toLowerCase().contains(arrivee.toLowerCase())).collect(Collectors.toList());
+        if (arriveeId != null) {
+            vols = vols.stream().filter(v -> v.getAeroportArrivee().getIdAeroport().equals(arriveeId)).collect(Collectors.toList());
+        } else if (arrivee != null && !arrivee.isEmpty()) {
+            String arr = arrivee.toLowerCase();
+            vols = vols.stream().filter(v -> v.getAeroportArrivee().getNom().toLowerCase().contains(arr) ||
+                                              v.getAeroportArrivee().getCodeIata().toLowerCase().contains(arr)).collect(Collectors.toList());
         }
         model.addAttribute("vols", vols);
         model.addAttribute("aeroports", aeroportService.getAllAeroports());
+        model.addAttribute("selectedDepart", depart);
+        model.addAttribute("selectedArrivee", arrivee);
+        model.addAttribute("selectedDepartId", departId);
+        model.addAttribute("selectedArriveeId", arriveeId);
         return "views/vol/list";
     }
 
@@ -162,5 +209,25 @@ public class VolController {
         model.addAttribute("selectedCompagnie", compagnieId);
 
         return "views/vol/stats";
+    }
+
+    @GetMapping("/vol/benefice/{id}")
+    public String showVolBenefice(@PathVariable Long id, Model model, HttpSession session) {
+        if (session.getAttribute("username") == null) {
+            return "redirect:/login";
+        }
+
+        Vol vol = volService.getVolById(id);
+        if (vol == null) {
+            return "redirect:/vol/benefice";
+        }
+
+        Double revenueMax = volService.getMaxRevenue(id);
+        var classRevenue = volService.getClassRevenue(id);
+
+        model.addAttribute("vol", vol);
+        model.addAttribute("revenueMax", revenueMax != null ? revenueMax : 0d);
+        model.addAttribute("classRevenue", classRevenue);
+        return "views/vol/benefice-detail";
     }
 }

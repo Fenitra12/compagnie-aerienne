@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.aerienne.gestion.model.vol.Vol;
 import com.aerienne.gestion.repository.vol.VolRepository;
+import com.aerienne.gestion.repository.vol.projection.VolClassRevenue;
 
 @Service
 public class VolService {
@@ -33,5 +34,13 @@ public class VolService {
 
     public Vol getVolById(Long id) {
         return volRepository.findById(id).orElse(null);
+    }
+
+    public Double getMaxRevenue(Long volId) {
+        return volRepository.calculateMaxRevenue(volId);
+    }
+
+    public List<VolClassRevenue> getClassRevenue(Long volId) {
+        return volRepository.findClassRevenue(volId);
     }
 }
