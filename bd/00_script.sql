@@ -54,14 +54,23 @@ CREATE TABLE Vol (
     id_aeroport_arrivee INT NOT NULL,
     date_depart TIMESTAMP NOT NULL,
     date_arrivee TIMESTAMP NOT NULL,
-    -- Snapshot of seating for business-side capacity control
-    seats_total INT NOT NULL DEFAULT 0,
-    seats_available INT NOT NULL DEFAULT 0,
+    -- Seats per class are stored in table Vol_Place_Classe (see below)
     id_statut INT DEFAULT 1,
     FOREIGN KEY (id_avion) REFERENCES Avion(id_avion),
     FOREIGN KEY (id_aeroport_depart) REFERENCES Aeroport(id_aeroport),
     FOREIGN KEY (id_aeroport_arrivee) REFERENCES Aeroport(id_aeroport),
     FOREIGN KEY (id_statut) REFERENCES StatutVol(id_statut)
+);
+
+-- Table Vol_Place_Classe : nombre de places par classe pour chaque vol
+CREATE TABLE Vol_Place_Classe (
+    id_vol_place SERIAL PRIMARY KEY,
+    id_vol INT NOT NULL,
+    classe VARCHAR(20) NOT NULL,
+    seats_total INT NOT NULL DEFAULT 0,
+    seats_available INT NOT NULL DEFAULT 0,
+    FOREIGN KEY (id_vol) REFERENCES Vol(id_vol),
+    UNIQUE (id_vol, classe)
 );
 
 -- Nouvelle table PrixVol (avant Reservation pour éviter l'erreur)
@@ -168,19 +177,19 @@ INSERT INTO StatutVol (nom) VALUES
 ('EN_COURS'),
 ('TERMINE');
 
-INSERT INTO Vol (id_avion, id_aeroport_depart, id_aeroport_arrivee, date_depart, date_arrivee, seats_total, seats_available, id_statut) VALUES
+INSERT INTO Vol (id_avion, id_aeroport_depart, id_aeroport_arrivee, date_depart, date_arrivee, id_statut) VALUES
 -- Air France vols
-(1, 1, 2, '2026-01-10 08:00:00', '2026-01-10 10:30:00', 180, 180, 1),
-(2, 1, 4, '2026-01-11 14:00:00', '2026-01-11 22:00:00', 250, 250, 1),
-(3, 1, 5, '2026-01-12 20:00:00', '2026-01-13 08:00:00', 300, 300, 1),
+(1, 1, 2, '2026-01-10 08:00:00', '2026-01-10 10:30:00', 1),
+(2, 1, 4, '2026-01-11 14:00:00', '2026-01-11 22:00:00', 1),
+(3, 1, 5, '2026-01-12 20:00:00', '2026-01-13 08:00:00', 1),
 
 -- Lufthansa vols
-(6, 3, 1, '2026-01-10 12:00:00', '2026-01-10 14:30:00', 180, 180, 1),
-(7, 3, 4, '2026-01-11 16:00:00', '2026-01-12 00:00:00', 300, 300, 1),
+(6, 3, 1, '2026-01-10 12:00:00', '2026-01-10 14:30:00', 1),
+(7, 3, 4, '2026-01-11 16:00:00', '2026-01-12 00:00:00', 1),
 
 -- Emirates vols
-(11, 4, 2, '2026-01-10 18:00:00', '2026-01-11 06:00:00', 500, 500, 1),
-(12, 4, 5, '2026-01-12 22:00:00', '2026-01-13 10:00:00', 350, 350, 1);
+(11, 4, 2, '2026-01-10 18:00:00', '2026-01-11 06:00:00', 1),
+(12, 4, 5, '2026-01-12 22:00:00', '2026-01-13 10:00:00', 1);
 
 INSERT INTO prix_vol (id_vol, classe, prix) VALUES
 -- Vol 1: Air France CDG -> LHR
@@ -213,3 +222,63 @@ INSERT INTO prix_vol (id_vol, classe, prix) VALUES
 -- Vol 7: Emirates DXB -> JFK
 (7, 'Economy', 550.00),
 (7, 'Business', 1100.00);
+
+-- Données de test: répartition des places par classe (seats_total = seats_available initialement)
+INSERT INTO Vol_Place_Classe (id_vol, classe, seats_total, seats_available) VALUES
+-- Vol 1 (capacité avion 180)
+(1, 'Economy', 140, 140),
+(1, 'Business', 30, 30),
+(1, 'First', 10, 10),
+
+-- Vol 2 (capacité 250)
+(2, 'Economy', 200, 200),
+(2, 'Business', 40, 40),
+(2, 'First', 10, 10),
+
+-- Vol 3 (capacité 300)
+(3, 'Economy', 220, 220),
+(3, 'Business', 60, 60),
+(3, 'First', 20, 20),
+
+-- Vol 4 (capacité 180) - pas de First dans prix_vol
+(4, 'Economy', 150, 150),
+(4, 'Business', 30, 30),
+
+-- Vol 5 (capacité 300) - pas de First dans prix_vol
+(5, 'Economy', 240, 240),
+(5, 'Business', 60, 60),
+
+-- Vol 6 (capacité 500) - pas de First dans prix_vol
+(6, 'Economy', 400, 400),
+(6, 'Business', 100, 100),
+
+-- Vol 7 (capacité 350) - pas de First dans prix_vol
+(7, 'Economy', 280, 280),
+(7, 'Business', 70, 70);
+
+-- Quelques passagers de test
+INSERT INTO Passager (nom, prenom, date_naissance, email) VALUES
+('Dupont', 'Jean', '1980-05-12', 'jean.dupont@example.com'),
+('Rasoa', 'Mialy', '1992-09-02', 'mialy.rasoa@example.com');
+
+-- Réservations de test (s'assure que la sous-requête récupère l'id_prix correct)
+INSERT INTO Reservation (id_passager, id_prix_vol, date_reservation, siege, statut)
+VALUES (
+    (SELECT id_passager FROM Passager WHERE email='jean.dupont@example.com'),
+    (SELECT id_prix FROM prix_vol WHERE id_vol=1 AND classe='Economy' LIMIT 1),
+    NOW(), '12A', 'confirmée'
+), (
+    (SELECT id_passager FROM Passager WHERE email='mialy.rasoa@example.com'),
+    (SELECT id_prix FROM prix_vol WHERE id_vol=2 AND classe='Business' LIMIT 1),
+    NOW(), '2B', 'confirmée'
+);
+
+
+
+SELECT v.id_vol,
+       SUM(vpc.seats_total * pv.prix) AS ca_maximal
+FROM Vol v
+JOIN Vol_Place_Classe vpc ON vpc.id_vol = v.id_vol
+JOIN prix_vol pv ON pv.id_vol = v.id_vol AND pv.classe = vpc.classe
+WHERE v.id_vol = 1
+GROUP BY v.id_vol;
