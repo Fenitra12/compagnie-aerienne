@@ -81,6 +81,7 @@ CREATE TABLE prix_vol (
     id_vol INT NOT NULL,
     classe VARCHAR(20) NOT NULL,
     prix NUMERIC(10,2) NOT NULL,
+    prix_reduction NUMERIC(10,2) DEFAULT 0,
     date_maj TIMESTAMP DEFAULT NOW(),
     FOREIGN KEY (id_vol) REFERENCES Vol(id_vol),
     -- id_compagnie removed to avoid redundancy (compagnie can be inferred via Vol->Avion->Compagnie)
@@ -115,7 +116,8 @@ CREATE TABLE Reservation (
     date_reservation TIMESTAMP DEFAULT NOW(),
     siege VARCHAR(5),
     statut VARCHAR(20) DEFAULT 'confirmée',
-    -- id_vol removed: reservation is linked to a flight through PrixVol -> Vol
+    adult_count INT NOT NULL DEFAULT 0,
+    child_count INT NOT NULL DEFAULT 0,
     FOREIGN KEY (id_passager) REFERENCES Passager(id_passager),
     FOREIGN KEY (id_prix_vol) REFERENCES prix_vol(id_prix)
 );
@@ -203,41 +205,39 @@ INSERT INTO Vol (id_avion, id_aeroport_depart, id_aeroport_arrivee, date_depart,
 -- Air France vols (nouveau) TNR -> NOS
 (16, 6, 7, '2026-02-10 09:00:00', '2026-02-10 11:00:00', 200, 200, 1);
 
-INSERT INTO prix_vol (id_vol, classe, prix) VALUES
+INSERT INTO prix_vol (id_vol, classe, prix, prix_reduction) VALUES
 -- Vol 1: Air France CDG -> LHR
-(1, 'Economy', 150.00),
-(1, 'Business', 300.00),
-(1, 'First', 500.00),
-
+(1, 'Economy', 150.00, 100.00),
+(1, 'Business', 300.00, 300.00),
+(1, 'First', 500.00, 300.00),
 -- Vol 2: Air France CDG -> DXB
-(2, 'Economy', 400.00),
-(2, 'Business', 800.00),
-(2, 'First', 1200.00),
+(2, 'Economy', 400.00, 400.00),
+(2, 'Business', 800.00, 800.00),
+(2, 'First', 1200.00, 1200.00),
 
 -- Vol 3: Air France CDG -> JFK
-(3, 'Economy', 600.00),
-(3, 'Business', 1200.00),
-(3, 'First', 2000.00),
+(3, 'Economy', 600.00, 600.00),
+(3, 'Business', 1200.00, 1200.00),
+(3, 'First', 2000.00, 2000.00),
 
 -- Vol 4: Lufthansa FRA -> CDG
-(4, 'Economy', 100.00),
-(4, 'Business', 200.00),
+(4, 'Economy', 100.00, 100.00),
+(4, 'Business', 200.00, 200.00),
 
 -- Vol 5: Lufthansa FRA -> DXB
-(5, 'Economy', 350.00),
-(5, 'Business', 700.00),
+(5, 'Economy', 350.00, 350.00),
+(5, 'Business', 700.00, 700.00),
 
 -- Vol 6: Emirates DXB -> LHR
-(6, 'Economy', 250.00),
-(6, 'Business', 500.00),
-
+(6, 'Economy', 250.00, 250.00),
+(6, 'Business', 500.00, 500.00),
 -- Vol 7: Emirates DXB -> JFK
-(7, 'Economy', 550.00),
-(7, 'Business', 1100.00),
+(7, 'Economy', 550.00, 550.00),
+(7, 'Business', 1100.00, 1100.00),
 
 -- Vol 8: Air France TNR -> NOS
-(8, 'Economy', 700000.00),
-(8, 'First', 1200000.00);
+(8, 'Economy', 700000.00, 500000.00),
+(8, 'First', 1200000.00, 1200000.00);
 
 -- Données de test: répartition des places par classe (seats_total = seats_available initialement)
 INSERT INTO Vol_Place_Classe (id_vol, classe, seats_total, seats_available) VALUES
@@ -282,23 +282,26 @@ INSERT INTO Passager (nom, prenom, date_naissance, email) VALUES
 ('Rasoa', 'Mialy', '1992-09-02', 'mialy.rasoa@example.com');
 
 -- Réservations de test (s'assure que la sous-requête récupère l'id_prix correct)
-INSERT INTO Reservation (id_passager, id_prix_vol, date_reservation, siege, statut)
+INSERT INTO Reservation (id_passager, id_prix_vol, date_reservation, siege, statut, adult_count, child_count)
 VALUES (
     (SELECT id_passager FROM Passager WHERE email='jean.dupont@example.com'),
     (SELECT id_prix FROM prix_vol WHERE id_vol=1 AND classe='Economy' LIMIT 1),
-    NOW(), '12A', 'confirmée'
+    NOW(), '12A', 'confirmée', 1, 0
 ), (
     (SELECT id_passager FROM Passager WHERE email='mialy.rasoa@example.com'),
     (SELECT id_prix FROM prix_vol WHERE id_vol=2 AND classe='Business' LIMIT 1),
-    NOW(), '2B', 'confirmée'
+    NOW(), '2B', 'confirmée', 1, 0
 );
 
 
-
+-- CA prenant en compte le prix enfant déjà réduit
 SELECT v.id_vol,
-       SUM(vpc.seats_total * pv.prix) AS ca_maximal
+       SUM(
+           r.adult_count * pv.prix
+           + r.child_count * (CASE WHEN pv.prix_reduction > 0 THEN pv.prix_reduction ELSE pv.prix END)
+       ) AS ca_reel
 FROM Vol v
-JOIN Vol_Place_Classe vpc ON vpc.id_vol = v.id_vol
-JOIN prix_vol pv ON pv.id_vol = v.id_vol AND pv.classe = vpc.classe
+JOIN prix_vol pv ON pv.id_vol = v.id_vol
+JOIN Reservation r ON r.id_prix_vol = pv.id_prix
 WHERE v.id_vol = 1
 GROUP BY v.id_vol;

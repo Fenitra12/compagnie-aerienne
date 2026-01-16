@@ -76,6 +76,19 @@ public class ReservationController {
             }
         }
 
+        if (reservation.getDateReservation() == null) {
+            reservation.setDateReservation(java.time.LocalDateTime.now());
+        }
+        if (reservation.getStatut() == null || reservation.getStatut().isBlank()) {
+            reservation.setStatut("confirmée");
+        }
+        if (reservation.getAdultCount() == null) {
+            reservation.setAdultCount(0);
+        }
+        if (reservation.getChildCount() == null) {
+            reservation.setChildCount(0);
+        }
+
         reservationService.saveReservation(reservation);
         return "redirect:/reservations";
     }

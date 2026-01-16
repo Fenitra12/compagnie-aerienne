@@ -32,6 +32,11 @@ public class Reservation {
     private LocalDateTime dateReservation;
     private String siege;
     private String statut;
+    @jakarta.persistence.Column(name = "adult_count")
+    private Integer adultCount;
+
+    @jakarta.persistence.Column(name = "child_count")
+    private Integer childCount;
 
     // getters & setters
     public Long getIdReservation() {
@@ -81,4 +86,21 @@ public class Reservation {
     public void setStatut(String statut) {
         this.statut = statut;
     }
+
+    public Integer getAdultCount() {
+        return adultCount;
+    }
+
+    public void setAdultCount(Integer adultCount) {
+        this.adultCount = adultCount;
+    }
+
+    public Integer getChildCount() {
+        return childCount;
+    }
+
+    public void setChildCount(Integer childCount) {
+        this.childCount = childCount;
+    }
+
 }

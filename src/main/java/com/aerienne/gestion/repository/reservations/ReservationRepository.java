@@ -15,7 +15,12 @@ import com.aerienne.gestion.repository.vol.VolRevenueView;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
 		@Query("""
-				SELECT new com.aerienne.gestion.repository.vol.VolRevenueView(v, SUM(p.prix), COUNT(r))
+				SELECT new com.aerienne.gestion.repository.vol.VolRevenueView(
+						v,
+						SUM(r.adultCount * p.prix
+						    + r.childCount * (CASE WHEN COALESCE(p.prixReduction, 0) > 0 THEN p.prixReduction ELSE p.prix END)),
+						SUM(r.adultCount + r.childCount)
+				)
 				FROM Reservation r
 				JOIN r.prixVol p
 				JOIN p.vol v
@@ -27,11 +32,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 					AND (:arriveeId IS NULL OR aa.idAeroport = :arriveeId)
 					AND (:compagnieId IS NULL OR a.compagnie.idCompagnie = :compagnieId)
 				GROUP BY v
-				ORDER BY SUM(p.prix) DESC
+				ORDER BY SUM(r.adultCount * p.prix
+				    + r.childCount * (CASE WHEN COALESCE(p.prixReduction, 0) > 0 THEN p.prixReduction ELSE p.prix END)) DESC
 				""")
 		List<VolRevenueView> findRevenueByVol(@Param("startDate") LocalDateTime startDate,
-																					@Param("endDate") LocalDateTime endDate,
-																					@Param("departId") Long departId,
-																					@Param("arriveeId") Long arriveeId,
-																					@Param("compagnieId") Long compagnieId);
+														@Param("endDate") LocalDateTime endDate,
+														@Param("departId") Long departId,
+														@Param("arriveeId") Long arriveeId,
+														@Param("compagnieId") Long compagnieId);
 }

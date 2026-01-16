@@ -16,6 +16,8 @@ import com.aerienne.gestion.model.reservations.Reservation;
 import com.aerienne.gestion.model.vol.Vol;
 import com.aerienne.gestion.repository.reservations.ReservationRepository;
 import com.aerienne.gestion.repository.vol.VolRepository;
+import com.aerienne.gestion.repository.vol.VolPlaceClasseRepository;
+import com.aerienne.gestion.model.vol.VolPlaceClasse;
 import com.aerienne.gestion.repository.vol.VolRevenueView;
 
 @Service
@@ -27,19 +29,37 @@ public class ReservationService {
     @Autowired
     private VolRepository volRepository;
 
+    @Autowired
+    private VolPlaceClasseRepository volPlaceClasseRepository;
+
     public List<Reservation> getAllReservations() {
         return reservationRepository.findAll();
     }
 
     @Transactional
     public Reservation saveReservation(Reservation reservation) {
+        int adults = reservation.getAdultCount() != null ? reservation.getAdultCount() : 0;
+        int children = reservation.getChildCount() != null ? reservation.getChildCount() : 0;
+        int totalPax = adults + children;
+        if (totalPax <= 0) {
+            throw new RuntimeException("At least one passenger is required.");
+        }
+
         // Vérifier la disponibilité des sièges
         Vol vol = reservation.getPrixVol().getVol();
-        if (vol.getSeatsAvailable() <= 0) {
-            throw new RuntimeException("Aucune place disponible pour ce vol.");
+        VolPlaceClasse placeClasse = volPlaceClasseRepository.findByVol_IdVolAndClasse(vol.getIdVol(), reservation.getPrixVol().getClasse());
+        if (placeClasse == null) {
+            throw new RuntimeException("Aucune configuration de places pour cette classe.");
         }
-        // Décrémenter les places disponibles
-        vol.setSeatsAvailable(vol.getSeatsAvailable() - 1);
+        if (placeClasse.getSeatsAvailable() < totalPax) {
+            throw new RuntimeException("Pas assez de places disponibles dans cette classe.");
+        }
+
+        // Décrémenter les places disponibles par classe et globales
+        placeClasse.setSeatsAvailable(placeClasse.getSeatsAvailable() - totalPax);
+        volPlaceClasseRepository.save(placeClasse);
+
+        vol.setSeatsAvailable(vol.getSeatsAvailable() - totalPax);
         volRepository.save(vol);
         return reservationRepository.save(reservation);
     }
@@ -47,9 +67,17 @@ public class ReservationService {
     public void deleteReservation(Long id) {
         Reservation reservation = reservationRepository.findById(id).orElse(null);
         if (reservation != null) {
+            int adults = reservation.getAdultCount() != null ? reservation.getAdultCount() : 0;
+            int children = reservation.getChildCount() != null ? reservation.getChildCount() : 0;
+            int totalPax = adults + children;
             // Remettre la place disponible
             Vol vol = reservation.getPrixVol().getVol();
-            vol.setSeatsAvailable(vol.getSeatsAvailable() + 1);
+            VolPlaceClasse placeClasse = volPlaceClasseRepository.findByVol_IdVolAndClasse(vol.getIdVol(), reservation.getPrixVol().getClasse());
+            if (placeClasse != null) {
+                placeClasse.setSeatsAvailable(placeClasse.getSeatsAvailable() + totalPax);
+                volPlaceClasseRepository.save(placeClasse);
+            }
+            vol.setSeatsAvailable(vol.getSeatsAvailable() + totalPax);
             volRepository.save(vol);
             reservationRepository.deleteById(id);
         }

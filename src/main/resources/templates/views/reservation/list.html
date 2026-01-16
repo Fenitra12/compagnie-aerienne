@@ -49,7 +49,10 @@
                         <th>Passager</th>
                         <th>Vol</th>
                         <th>Classe</th>
-                        <th>Prix</th>
+                        <th>Prix unitaire</th>
+                        <th>Adultes</th>
+                        <th>Enfants</th>
+                        <th>Montant</th>
                         <th>Date Réservation</th>
                         <th>Statut</th>
                         <th>Actions</th>
@@ -62,6 +65,10 @@
                         <td th:text="${reservation.prixVol.vol.aeroportDepart.codeIata} + ' → ' + ${reservation.prixVol.vol.aeroportArrivee.codeIata}"></td>
                         <td th:text="${reservation.prixVol.classe}"></td>
                         <td th:text="${reservation.prixVol.prix} + ' €'"></td>
+                        <td th:text="${reservation.adultCount}"></td>
+                        <td th:text="${reservation.childCount}"></td>
+                        <td th:text="${reservation.adultCount * reservation.prixVol.prix
+                            + reservation.childCount * (reservation.prixVol.prixReduction != null && reservation.prixVol.prixReduction > 0 ? reservation.prixVol.prixReduction : reservation.prixVol.prix)} + ' €'"></td>
                         <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy HH:mm')}"></td>
                         <td th:text="${reservation.statut}"></td>
                         <td>

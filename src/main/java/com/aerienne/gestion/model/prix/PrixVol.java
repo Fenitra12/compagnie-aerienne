@@ -34,6 +34,10 @@ public class PrixVol {
     @Column(name = "prix")
     private Double prix;
 
+    // Child price after reduction (if 0, fallback to full price)
+    @Column(name = "prix_reduction")
+    private Double prixReduction;
+
     @Column(name = "date_maj")
     private LocalDateTime dateMaj;
 
@@ -68,6 +72,14 @@ public class PrixVol {
 
     public void setPrix(Double prix) {
         this.prix = prix;
+    }
+
+    public Double getPrixReduction() {
+        return prixReduction;
+    }
+
+    public void setPrixReduction(Double prixReduction) {
+        this.prixReduction = prixReduction;
     }
 
     public LocalDateTime getDateMaj() {

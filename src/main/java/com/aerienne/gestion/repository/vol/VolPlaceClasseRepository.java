@@ -10,5 +10,6 @@ import com.aerienne.gestion.model.vol.VolPlaceClasse;
 @Repository
 public interface VolPlaceClasseRepository extends JpaRepository<VolPlaceClasse, Long> {
     List<VolPlaceClasse> findByVol_IdVol(Long volId);
+    VolPlaceClasse findByVol_IdVolAndClasse(Long volId, String classe);
     void deleteByVol_IdVol(Long volId);
 }
