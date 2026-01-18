@@ -82,6 +82,7 @@ CREATE TABLE prix_vol (
     classe VARCHAR(20) NOT NULL,
     prix NUMERIC(10,2) NOT NULL,
     prix_reduction NUMERIC(10,2) DEFAULT 0,
+    prix_bebe NUMERIC(10,2) DEFAULT 0,
     date_maj TIMESTAMP DEFAULT NOW(),
     FOREIGN KEY (id_vol) REFERENCES Vol(id_vol),
     -- id_compagnie removed to avoid redundancy (compagnie can be inferred via Vol->Avion->Compagnie)
@@ -118,6 +119,7 @@ CREATE TABLE Reservation (
     statut VARCHAR(20) DEFAULT 'confirmée',
     adult_count INT NOT NULL DEFAULT 0,
     child_count INT NOT NULL DEFAULT 0,
+    baby_count INT NOT NULL DEFAULT 0,
     FOREIGN KEY (id_passager) REFERENCES Passager(id_passager),
     FOREIGN KEY (id_prix_vol) REFERENCES prix_vol(id_prix)
 );

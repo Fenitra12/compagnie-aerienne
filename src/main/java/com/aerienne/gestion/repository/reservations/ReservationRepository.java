@@ -14,12 +14,15 @@ import com.aerienne.gestion.repository.vol.VolRevenueView;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
+		long countByPrixVol_IdPrix(Long idPrix);
+
 		@Query("""
 				SELECT new com.aerienne.gestion.repository.vol.VolRevenueView(
 						v,
 						SUM(r.adultCount * p.prix
-						    + r.childCount * (CASE WHEN COALESCE(p.prixReduction, 0) > 0 THEN p.prixReduction ELSE p.prix END)),
-						SUM(r.adultCount + r.childCount)
+						    + r.childCount * (CASE WHEN COALESCE(p.prixReduction, 0) > 0 THEN p.prixReduction ELSE p.prix END)
+						    + r.babyCount * (CASE WHEN COALESCE(p.prixBebe, 0) > 0 THEN p.prixBebe ELSE p.prix * 0.1 END)),
+						SUM(r.adultCount + r.childCount + r.babyCount)
 				)
 				FROM Reservation r
 				JOIN r.prixVol p
@@ -33,7 +36,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 					AND (:compagnieId IS NULL OR a.compagnie.idCompagnie = :compagnieId)
 				GROUP BY v
 				ORDER BY SUM(r.adultCount * p.prix
-				    + r.childCount * (CASE WHEN COALESCE(p.prixReduction, 0) > 0 THEN p.prixReduction ELSE p.prix END)) DESC
+				    + r.childCount * (CASE WHEN COALESCE(p.prixReduction, 0) > 0 THEN p.prixReduction ELSE p.prix END)
+				    + r.babyCount * (CASE WHEN COALESCE(p.prixBebe, 0) > 0 THEN p.prixBebe ELSE p.prix * 0.1 END)) DESC
 				""")
 		List<VolRevenueView> findRevenueByVol(@Param("startDate") LocalDateTime startDate,
 														@Param("endDate") LocalDateTime endDate,

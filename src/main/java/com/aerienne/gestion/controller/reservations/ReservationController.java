@@ -88,6 +88,9 @@ public class ReservationController {
         if (reservation.getChildCount() == null) {
             reservation.setChildCount(0);
         }
+        if (reservation.getBabyCount() == null) {
+            reservation.setBabyCount(0);
+        }
 
         reservationService.saveReservation(reservation);
         return "redirect:/reservations";

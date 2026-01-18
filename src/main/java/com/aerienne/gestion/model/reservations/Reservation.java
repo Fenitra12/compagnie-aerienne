@@ -38,6 +38,9 @@ public class Reservation {
     @jakarta.persistence.Column(name = "child_count")
     private Integer childCount;
 
+    @jakarta.persistence.Column(name = "baby_count")
+    private Integer babyCount;
+
     // getters & setters
     public Long getIdReservation() {
         return idReservation;
@@ -101,6 +104,14 @@ public class Reservation {
 
     public void setChildCount(Integer childCount) {
         this.childCount = childCount;
+    }
+
+    public Integer getBabyCount() {
+        return babyCount;
+    }
+
+    public void setBabyCount(Integer babyCount) {
+        this.babyCount = babyCount;
     }
 
 }

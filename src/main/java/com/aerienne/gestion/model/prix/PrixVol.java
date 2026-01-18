@@ -38,6 +38,10 @@ public class PrixVol {
     @Column(name = "prix_reduction")
     private Double prixReduction;
 
+    // Baby price (defaults to 10% of adult price if null or zero)
+    @Column(name = "prix_bebe")
+    private Double prixBebe;
+
     @Column(name = "date_maj")
     private LocalDateTime dateMaj;
 
@@ -80,6 +84,14 @@ public class PrixVol {
 
     public void setPrixReduction(Double prixReduction) {
         this.prixReduction = prixReduction;
+    }
+
+    public Double getPrixBebe() {
+        return prixBebe;
+    }
+
+    public void setPrixBebe(Double prixBebe) {
+        this.prixBebe = prixBebe;
     }
 
     public LocalDateTime getDateMaj() {

@@ -88,6 +88,8 @@
                                     <th>Classe</th>
                                     <th>Places</th>
                                     <th>Prix</th>
+                                    <th>Prix enfant (réduit)</th>
+                                    <th>Prix bébé (pourcentage ou fixe)</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -102,12 +104,22 @@
                                         <input type="number" step="0.01" name="prixClasse" min="0" class="form-control"
                                                th:value="${prixMap[cls.classe]}">
                                     </td>
+                                    <td>
+                                        <input type="number" step="0.01" name="prixReductionClasse" min="0" class="form-control"
+                                               th:value="${prixReductionMap[cls.classe]}">
+                                    </td>
+                                    <td>
+                                             <input type="number" step="0.01" name="prixBebeClasse" min="0" class="form-control"
+                                                 th:value="${prixBebeMap[cls.classe]}" placeholder="Ex: 10 = 10%, 50 = 50%">
+                                    </td>
                                 </tr>
                                 <!-- Ajout de lignes vides pour en créer d'autres si besoin -->
                                 <tr th:each="i : ${#numbers.sequence(1,3)}">
                                     <td><input type="text" name="classe" class="form-control" placeholder="Nouvelle classe"></td>
                                     <td><input type="number" name="seatsClasse" min="0" class="form-control" placeholder="Places"></td>
                                     <td><input type="number" step="0.01" name="prixClasse" min="0" class="form-control" placeholder="Prix"></td>
+                                    <td><input type="number" step="0.01" name="prixReductionClasse" min="0" class="form-control" placeholder="Prix enfant"></td>
+                                    <td><input type="number" step="0.01" name="prixBebeClasse" min="0" class="form-control" placeholder="Ex: 10 = 10%, 50 = 50%"></td>
                                 </tr>
                                 </tbody>
                             </table>

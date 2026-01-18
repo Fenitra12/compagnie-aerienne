@@ -135,13 +135,15 @@ public class VolController {
     public String addVol(@ModelAttribute Vol vol, HttpSession session,
                          @RequestParam(name = "classe", required = false) List<String> classes,
                          @RequestParam(name = "seatsClasse", required = false) List<Integer> seatsClasse,
-                         @RequestParam(name = "prixClasse", required = false) List<Double> prixClasse) {
+                         @RequestParam(name = "prixClasse", required = false) List<Double> prixClasse,
+                         @RequestParam(name = "prixReductionClasse", required = false) List<Double> prixReductionClasse,
+                         @RequestParam(name = "prixBebeClasse", required = false) List<Double> prixBebeClasse) {
         if (session.getAttribute("username") == null) {
             return "redirect:/login";
         }
 
         Vol saved = volService.saveVol(vol);
-        volService.replaceClassesAndPrices(saved, classes, seatsClasse, prixClasse);
+        volService.replaceClassesAndPrices(saved, classes, seatsClasse, prixClasse, prixReductionClasse, prixBebeClasse);
         return "redirect:/vol";
     }
 
@@ -156,6 +158,10 @@ public class VolController {
         List<PrixVol> prix = volService.getPrixByVol(id);
         Map<String, Double> prixMap = prix.stream()
             .collect(Collectors.toMap(PrixVol::getClasse, PrixVol::getPrix, (a, b) -> a));
+        Map<String, Double> prixReductionMap = prix.stream()
+            .collect(Collectors.toMap(PrixVol::getClasse, p -> p.getPrixReduction() != null ? p.getPrixReduction() : p.getPrix(), (a, b) -> a));
+        Map<String, Double> prixBebeMap = prix.stream()
+            .collect(Collectors.toMap(PrixVol::getClasse, p -> p.getPrixBebe() != null ? p.getPrixBebe() : p.getPrix() * 0.1, (a, b) -> a));
         model.addAttribute("vol", vol);
         model.addAttribute("avions", avionService.getAllAvions());
         model.addAttribute("aeroports", aeroportService.getAllAeroports());
@@ -163,6 +169,8 @@ public class VolController {
         model.addAttribute("classes", classes);
         model.addAttribute("prix", prix);
         model.addAttribute("prixMap", prixMap);
+        model.addAttribute("prixReductionMap", prixReductionMap);
+        model.addAttribute("prixBebeMap", prixBebeMap);
         return "views/vol/edit";
     }
 
@@ -170,14 +178,16 @@ public class VolController {
     public String editVol(@PathVariable Long id, @ModelAttribute Vol vol, HttpSession session,
                           @RequestParam(name = "classe", required = false) List<String> classes,
                           @RequestParam(name = "seatsClasse", required = false) List<Integer> seatsClasse,
-                          @RequestParam(name = "prixClasse", required = false) List<Double> prixClasse) {
+                          @RequestParam(name = "prixClasse", required = false) List<Double> prixClasse,
+                          @RequestParam(name = "prixReductionClasse", required = false) List<Double> prixReductionClasse,
+                          @RequestParam(name = "prixBebeClasse", required = false) List<Double> prixBebeClasse) {
         if (session.getAttribute("username") == null) {
             return "redirect:/login";
         }
 
         vol.setIdVol(id);
         Vol saved = volService.saveVol(vol);
-        volService.replaceClassesAndPrices(saved, classes, seatsClasse, prixClasse);
+        volService.replaceClassesAndPrices(saved, classes, seatsClasse, prixClasse, prixReductionClasse, prixBebeClasse);
         return "redirect:/vol";
     }
 

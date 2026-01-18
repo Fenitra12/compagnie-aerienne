@@ -14,10 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.aerienne.gestion.model.reservations.Reservation;
 import com.aerienne.gestion.model.vol.Vol;
-import com.aerienne.gestion.repository.reservations.ReservationRepository;
-import com.aerienne.gestion.repository.vol.VolRepository;
-import com.aerienne.gestion.repository.vol.VolPlaceClasseRepository;
 import com.aerienne.gestion.model.vol.VolPlaceClasse;
+import com.aerienne.gestion.repository.reservations.ReservationRepository;
+import com.aerienne.gestion.repository.vol.VolPlaceClasseRepository;
+import com.aerienne.gestion.repository.vol.VolRepository;
 import com.aerienne.gestion.repository.vol.VolRevenueView;
 
 @Service
@@ -40,7 +40,8 @@ public class ReservationService {
     public Reservation saveReservation(Reservation reservation) {
         int adults = reservation.getAdultCount() != null ? reservation.getAdultCount() : 0;
         int children = reservation.getChildCount() != null ? reservation.getChildCount() : 0;
-        int totalPax = adults + children;
+        int babies = reservation.getBabyCount() != null ? reservation.getBabyCount() : 0;
+        int totalPax = adults + children + babies;
         if (totalPax <= 0) {
             throw new RuntimeException("At least one passenger is required.");
         }
@@ -69,7 +70,8 @@ public class ReservationService {
         if (reservation != null) {
             int adults = reservation.getAdultCount() != null ? reservation.getAdultCount() : 0;
             int children = reservation.getChildCount() != null ? reservation.getChildCount() : 0;
-            int totalPax = adults + children;
+            int babies = reservation.getBabyCount() != null ? reservation.getBabyCount() : 0;
+            int totalPax = adults + children + babies;
             // Remettre la place disponible
             Vol vol = reservation.getPrixVol().getVol();
             VolPlaceClasse placeClasse = volPlaceClasseRepository.findByVol_IdVolAndClasse(vol.getIdVol(), reservation.getPrixVol().getClasse());

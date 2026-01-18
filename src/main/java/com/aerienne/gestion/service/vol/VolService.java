@@ -13,6 +13,7 @@ import com.aerienne.gestion.repository.vol.VolRepository;
 import com.aerienne.gestion.repository.vol.VolPlaceClasseRepository;
 import com.aerienne.gestion.repository.prix.PrixVolRepository;
 import com.aerienne.gestion.repository.vol.projection.VolClassRevenue;
+import com.aerienne.gestion.repository.reservations.ReservationRepository;
 
 @Service
 public class VolService {
@@ -25,6 +26,9 @@ public class VolService {
 
     @Autowired
     private PrixVolRepository prixVolRepository;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     public List<Vol> getAllVols() {
         return volRepository.findAll();
@@ -39,18 +43,19 @@ public class VolService {
     }
 
     @Transactional
-    public void replaceClassesAndPrices(Vol vol, List<String> classes, List<Integer> seats, List<Double> prices) {
+    public void replaceClassesAndPrices(Vol vol, List<String> classes, List<Integer> seats, List<Double> prices, List<Double> priceReductions, List<Double> babyPrices) {
         if (vol == null || classes == null || seats == null || prices == null) {
             return;
         }
 
-        // Nettoyer existant puis flusher pour éviter les conflits de contrainte uniques
+        // Réinitialiser les places par classe (pas de FK sortante)
         volPlaceClasseRepository.deleteByVol_IdVol(vol.getIdVol());
         volPlaceClasseRepository.flush();
-        prixVolRepository.deleteAll(prixVolRepository.findByVol_IdVol(vol.getIdVol()));
-        prixVolRepository.flush();
 
         var seen = new java.util.HashSet<String>();
+        var existingPrix = prixVolRepository.findByVol_IdVol(vol.getIdVol())
+                .stream().collect(java.util.stream.Collectors.toMap(PrixVol::getClasse, p -> p, (a, b) -> a, java.util.LinkedHashMap::new));
+        var toKeep = new java.util.HashSet<String>();
 
         for (int i = 0; i < classes.size(); i++) {
             String cls = classes.get(i);
@@ -59,12 +64,13 @@ public class VolService {
             }
             String clsKey = cls.trim();
             if (!seen.add(clsKey.toLowerCase())) {
-                // Ignore doublons de classe pour éviter la contrainte UNIQUE (id_vol, classe)
-                continue;
+                continue; // ignore doublons
             }
 
             Integer seatTotal = seats.size() > i ? seats.get(i) : null;
             Double price = prices.size() > i ? prices.get(i) : null;
+            Double priceReduction = priceReductions != null && priceReductions.size() > i ? priceReductions.get(i) : null;
+            Double priceBebe = babyPrices != null && babyPrices.size() > i ? babyPrices.get(i) : null;
             if (seatTotal == null || seatTotal < 0 || price == null) {
                 continue;
             }
@@ -74,16 +80,42 @@ public class VolService {
             vpc.setVol(vol);
             vpc.setClasse(clsKey);
             vpc.setSeatsTotal(seatTotal);
-            vpc.setSeatsAvailable(seatTotal); // reset disponible = total saisi
+            vpc.setSeatsAvailable(seatTotal);
             volPlaceClasseRepository.save(vpc);
 
-            // Prix
-            PrixVol pv = new PrixVol();
+            // Prix : update ou create
+            PrixVol pv = existingPrix.getOrDefault(clsKey, new PrixVol());
             pv.setVol(vol);
             pv.setClasse(clsKey);
             pv.setPrix(price);
+            pv.setPrixReduction(priceReduction != null && priceReduction > 0 ? priceReduction : price);
+            double defaultBaby = price * 0.1;
+            if (priceBebe != null && priceBebe > 0) {
+                // Si la valeur est <= 100, on considère que c'est un pourcentage du prix adulte
+                double babyValue = priceBebe <= 100 ? price * (priceBebe / 100d) : priceBebe;
+                pv.setPrixBebe(babyValue);
+            } else {
+                pv.setPrixBebe(defaultBaby);
+            }
             prixVolRepository.save(pv);
+            toKeep.add(clsKey);
         }
+
+        // Supprimer les prix orphelins uniquement si non référencés par des réservations
+        for (var entry : existingPrix.entrySet()) {
+            if (toKeep.contains(entry.getKey())) {
+                continue;
+            }
+            PrixVol pv = entry.getValue();
+            Long idPrix = pv.getIdPrix();
+            if (idPrix != null) {
+                long refs = reservationRepository.countByPrixVol_IdPrix(idPrix);
+                if (refs == 0) {
+                    prixVolRepository.delete(pv);
+                }
+            }
+        }
+        prixVolRepository.flush();
     }
 
     public List<VolPlaceClasse> getClasses(Long volId) {

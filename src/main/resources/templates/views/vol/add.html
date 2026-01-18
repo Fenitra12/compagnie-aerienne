@@ -95,6 +95,8 @@
                             <th>Classe</th>
                             <th>Places</th>
                             <th>Prix</th>
+                            <th>Prix enfant (réduit)</th>
+                            <th>Prix bébé (pourcentage ou fixe)</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -107,6 +109,12 @@
                             </td>
                             <td>
                                 <input type="number" step="0.01" name="prixClasse" min="0" class="form-control" required>
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" name="prixReductionClasse" min="0" class="form-control" placeholder="Optionnel">
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" name="prixBebeClasse" min="0" class="form-control" placeholder="Ex: 10 = 10%, 50 = 50%">
                             </td>
                         </tr>
                         </tbody>

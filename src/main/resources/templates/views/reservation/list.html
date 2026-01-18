@@ -52,6 +52,7 @@
                         <th>Prix unitaire</th>
                         <th>Adultes</th>
                         <th>Enfants</th>
+                        <th>Bébés</th>
                         <th>Montant</th>
                         <th>Date Réservation</th>
                         <th>Statut</th>
@@ -65,10 +66,14 @@
                         <td th:text="${reservation.prixVol.vol.aeroportDepart.codeIata} + ' → ' + ${reservation.prixVol.vol.aeroportArrivee.codeIata}"></td>
                         <td th:text="${reservation.prixVol.classe}"></td>
                         <td th:text="${reservation.prixVol.prix} + ' €'"></td>
-                        <td th:text="${reservation.adultCount}"></td>
-                        <td th:text="${reservation.childCount}"></td>
-                        <td th:text="${reservation.adultCount * reservation.prixVol.prix
-                            + reservation.childCount * (reservation.prixVol.prixReduction != null && reservation.prixVol.prixReduction > 0 ? reservation.prixVol.prixReduction : reservation.prixVol.prix)} + ' €'"></td>
+                        <td th:text="${reservation.adultCount ?: 0}"></td>
+                        <td th:text="${reservation.childCount ?: 0}"></td>
+                        <td th:text="${reservation.babyCount ?: 0}"></td>
+                        <td th:text="${#numbers.formatDecimal(
+                            (reservation.adultCount ?: 0) * reservation.prixVol.prix
+                            + (reservation.childCount ?: 0) * (reservation.prixVol.prixReduction != null && reservation.prixVol.prixReduction > 0 ? reservation.prixVol.prixReduction : reservation.prixVol.prix)
+                            + (reservation.babyCount ?: 0) * (reservation.prixVol.prixBebe != null && reservation.prixVol.prixBebe > 0 ? reservation.prixVol.prixBebe : reservation.prixVol.prix * 0.1),
+                            1, 'COMMA', 2, 'POINT')} + ' €'"></td>
                         <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy HH:mm')}"></td>
                         <td th:text="${reservation.statut}"></td>
                         <td>
