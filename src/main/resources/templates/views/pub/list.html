@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diffusions pub | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="ui/menu :: menu"></div>
+
+    <main class="main-area">
+        <header class="main-header">
+            <div>
+                <p class="eyebrow">Fenitra ETU003660</p>
+                <h1>Diffusions publicitaires</h1>
+            </div>
+            <div class="user-chip">
+                <span class="status-dot"></span>
+                <span>CA publicitaire</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <article class="card">
+                <p class="badge">Résumé</p>
+                <h2 class="section-title">Nombre d'entrées</h2>
+                <h3 th:text="${diffusions == null ? 0 : diffusions.size()} + ' enregistrements'"></h3>
+                <div style="margin-top: 12px;">
+                    <a href="/pub/add" class="btn-primary" style="margin-right: 8px;">Ajouter</a>
+                    <a href="/pub/stats" class="btn-secondary">Voir CA pub</a>
+                    <a href="/pub/publicites" class="btn-secondary" style="margin-left: 8px;">Publicités</a>
+                    <a href="/pub/societes" class="btn-secondary" style="margin-left: 8px;">Sociétés</a>
+                </div>
+            </article>
+        </section>
+
+        <section class="content-section" th:if="${success != null || error != null}">
+            <article class="card" th:classappend=" ${error != null} ? ' card-danger' : ' card-success'">
+                <p class="badge" th:text="${error != null} ? 'Erreur' : 'Succès'"></p>
+                <p th:text="${error != null} ? ${error} : ${success}"></p>
+            </article>
+        </section>
+
+        <section class="table-wrapper">
+            <header>
+                <div>
+                    <p class="badge">Liste</p>
+                    <h2 class="section-title">Diffusions</h2>
+                </div>
+            </header>
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="data-table" style="min-width: 1000px;">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Société</th>
+                        <th>Publicité</th>
+                        <th>Vol</th>
+                        <th>Période</th>
+                        <th>Diffusions</th>
+                        <th>Prix unitaire</th>
+                        <th>CA</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="d : ${diffusions}">
+                        <td th:text="${d.idDiffusion}"></td>
+                        <td th:text="${d.publicite != null && d.publicite.societe != null ? d.publicite.societe.nom : 'N/A'}"></td>
+                        <td th:text="${d.publicite != null ? d.publicite.titre : 'N/A'}"></td>
+                        <td th:text="${d.vol != null ? d.vol.aeroportDepart.codeIata + ' -> ' + d.vol.aeroportArrivee.codeIata : 'Non lié'}"></td>
+                        <td th:text="${d.annee} + '-' + ${#numbers.formatInteger(d.mois != null ? d.mois : 0, 2)}"></td>
+                        <td th:text="${d.nombreDiffusions}"></td>
+                        <td th:text="${#numbers.formatDecimal(d.prixParDiffusion, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(d.nombreDiffusions * d.prixParDiffusion, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td>
+                            <a th:href="@{/pub/edit/{id}(id=${d.idDiffusion})}" class="btn-edit">Modifier</a>
+                            <form th:action="@{/pub/delete/{id}(id=${d.idDiffusion})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn-delete" onclick="return confirm('Supprimer cette diffusion ?');">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="main-footer">
+            <span>© 2026 Compagnie aérienne</span>
+            <span>Interface conçue pour ETU003660</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

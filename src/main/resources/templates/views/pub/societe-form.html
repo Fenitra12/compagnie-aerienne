@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edition société | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="ui/menu :: menu"></div>
+
+    <main class="main-area">
+        <header class="main-header">
+            <div>
+                <p class="eyebrow">Fenitra ETU003660</p>
+                <h1 th:text="${societeId != null} ? 'Modifier une société' : 'Ajouter une société'"></h1>
+            </div>
+            <div class="user-chip">
+                <span class="status-dot"></span>
+                <span>Gestion pubs</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <article class="card">
+                <p class="badge">Formulaire</p>
+                <h2 class="section-title">Informations société</h2>
+                <form th:action="${societeId != null} ? @{/pub/societes/edit/{id}(id=${societeId})} : @{/pub/societes/add}"
+                      method="post" class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
+                    <div class="form-group">
+                        <label for="nom">Nom</label>
+                        <input type="text" id="nom" name="nom" required th:value="${societe.nom}">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">Contact</label>
+                        <input type="text" id="contact" name="contact" th:value="${societe.contact}">
+                    </div>
+                    <div class="form-group" style="align-self:end;">
+                        <button type="submit" class="btn-primary">Enregistrer</button>
+                        <a href="/pub/societes" class="btn-secondary" style="margin-left:8px;">Annuler</a>
+                    </div>
+                </form>
+            </article>
+        </section>
+
+        <footer class="main-footer">
+            <span>© 2026 Compagnie aérienne</span>
+            <span>Interface conçue pour ETU003660</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

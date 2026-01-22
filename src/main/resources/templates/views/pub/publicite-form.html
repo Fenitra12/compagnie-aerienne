@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edition publicité | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="ui/menu :: menu"></div>
+
+    <main class="main-area">
+        <header class="main-header">
+            <div>
+                <p class="eyebrow">Fenitra ETU003660</p>
+                <h1 th:text="${publiciteId != null} ? 'Modifier une publicité' : 'Ajouter une publicité'"></h1>
+            </div>
+            <div class="user-chip">
+                <span class="status-dot"></span>
+                <span>Gestion pubs</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <article class="card">
+                <p class="badge">Formulaire</p>
+                <h2 class="section-title">Informations publicité</h2>
+                <form th:action="${publiciteId != null} ? @{/pub/publicites/edit/{id}(id=${publiciteId})} : @{/pub/publicites/add}"
+                      method="post" class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
+                    <div class="form-group">
+                        <label for="societeId">Société</label>
+                        <select id="societeId" name="societeId" required>
+                            <option value="" disabled th:selected="${publicite.societe == null}">Choisir...</option>
+                            <option th:each="s : ${societes}" th:value="${s.idSociete}" th:text="${s.nom}"
+                                    th:selected="${publicite.societe != null && publicite.societe.idSociete == s.idSociete}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="titre">Titre</label>
+                        <input type="text" id="titre" name="titre" th:value="${publicite.titre}">
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="4" th:text="${publicite.description}"></textarea>
+                    </div>
+                    <div class="form-group" style="align-self:end;">
+                        <button type="submit" class="btn-primary">Enregistrer</button>
+                        <a href="/pub/publicites" class="btn-secondary" style="margin-left:8px;">Annuler</a>
+                    </div>
+                </form>
+            </article>
+        </section>
+
+        <footer class="main-footer">
+            <span>© 2026 Compagnie aérienne</span>
+            <span>Interface conçue pour ETU003660</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

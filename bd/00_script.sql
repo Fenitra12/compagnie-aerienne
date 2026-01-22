@@ -135,6 +135,28 @@ CREATE TABLE Equipage (
     UNIQUE (id_vol, id_pilote)
 );
 
+CREATE TABLE Societe (
+    id_societe SERIAL PRIMARY KEY,
+    nom VARCHAR(100) UNIQUE NOT NULL,
+    contact VARCHAR(200)
+);
+
+CREATE TABLE Publicite (
+    id_publicite SERIAL PRIMARY KEY,
+    id_societe INT NOT NULL REFERENCES Societe(id_societe),
+    titre VARCHAR(200),
+    description TEXT
+);
+
+CREATE TABLE diffusion_pub (
+    id_diffusion SERIAL PRIMARY KEY,
+    id_publicite INT NOT NULL REFERENCES Publicite(id_publicite),
+    id_vol INT REFERENCES Vol(id_vol),
+    annee INT NOT NULL,
+    mois INT NOT NULL, -- 1..12
+    nombre_diffusions INT NOT NULL DEFAULT 0,
+    prix_par_diffusion NUMERIC(15,2) NOT NULL
+);
 
 
 -- Insérer le compte admin par défaut
@@ -295,6 +317,16 @@ VALUES (
     NOW(), '2B', 'confirmée', 1, 0
 );
 
+INSERT INTO Societe (nom) VALUES ('Vaniala'), ('Lewis');
+
+INSERT INTO Publicite (id_societe, titre) VALUES
+  ((SELECT id_societe FROM Societe WHERE nom='Vaniala'), 'Pub Vaniala'),
+  ((SELECT id_societe FROM Societe WHERE nom='Lewis'), 'Pub Lewis');
+
+INSERT INTO diffusion_pub (id_publicite, id_vol, annee, mois, nombre_diffusions, prix_par_diffusion) VALUES
+    ((SELECT id_publicite FROM Publicite WHERE titre='Pub Vaniala'), 8, 2025, 12, 20, 200000),
+    ((SELECT id_publicite FROM Publicite WHERE titre='Pub Lewis'), 8, 2025, 12, 10, 200000);
+
 
 -- CA prenant en compte le prix enfant déjà réduit
 SELECT v.id_vol,
@@ -307,3 +339,17 @@ JOIN prix_vol pv ON pv.id_vol = v.id_vol
 JOIN Reservation r ON r.id_prix_vol = pv.id_prix
 WHERE v.id_vol = 1
 GROUP BY v.id_vol;
+
+--Requête CA total en décembre 2025
+SELECT SUM(nombre_diffusions * prix_par_diffusion) AS ca_total
+FROM diffusion_pub
+WHERE annee = 2025 AND mois = 12;
+
+-- Requête CA par société en décembre 2025
+SELECT s.nom AS societe,
+       SUM(d.nombre_diffusions * d.prix_par_diffusion) AS ca_mensuel
+FROM diffusion_pub d
+JOIN Publicite p ON d.id_publicite = p.id_publicite
+JOIN Societe s ON p.id_societe = s.id_societe
+WHERE d.annee = 2025 AND d.mois = 12
+GROUP BY s.nom;

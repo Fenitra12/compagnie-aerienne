@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicités | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="ui/menu :: menu"></div>
+
+    <main class="main-area">
+        <header class="main-header">
+            <div>
+                <p class="eyebrow">Fenitra ETU003660</p>
+                <h1>Publicités</h1>
+            </div>
+            <div class="user-chip">
+                <span class="status-dot"></span>
+                <span>Gestion pubs</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <article class="card">
+                <p class="badge">Actions</p>
+                <h2 class="section-title">Raccourcis</h2>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <a href="/pub" class="btn-secondary">Diffusions</a>
+                    <a href="/pub/societes" class="btn-secondary">Sociétés</a>
+                    <a href="/pub/publicites/add" class="btn-primary">Ajouter une publicité</a>
+                </div>
+            </article>
+        </section>
+
+        <section class="content-section" th:if="${success != null || error != null}">
+            <article class="card" th:classappend=" ${error != null} ? ' card-danger' : ' card-success'">
+                <p class="badge" th:text="${error != null} ? 'Erreur' : 'Succès'"></p>
+                <p th:text="${error != null} ? ${error} : ${success}"></p>
+            </article>
+        </section>
+
+        <section class="table-wrapper">
+            <header>
+                <div>
+                    <p class="badge">Liste</p>
+                    <h2 class="section-title">Publicités</h2>
+                </div>
+            </header>
+            <div class="table-responsive" style="overflow-x:auto;">
+                <table class="data-table" style="min-width: 820px;">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Société</th>
+                        <th>Titre</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${publicites}">
+                        <td th:text="${p.idPublicite}"></td>
+                        <td th:text="${p.societe != null ? p.societe.nom : 'N/A'}"></td>
+                        <td th:text="${p.titre}"></td>
+                        <td th:text="${p.description}"></td>
+                        <td>
+                            <a th:href="@{/pub/publicites/edit/{id}(id=${p.idPublicite})}" class="btn-edit">Modifier</a>
+                            <form th:action="@{/pub/publicites/delete/{id}(id=${p.idPublicite})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn-delete" onclick="return confirm('Supprimer cette publicité ?');">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="main-footer">
+            <span>© 2026 Compagnie aérienne</span>
+            <span>Interface conçue pour ETU003660</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

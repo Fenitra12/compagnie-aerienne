@@ -3,6 +3,7 @@ D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\control
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\login\HelloController.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\login\LoginController.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\prix\PrixVolController.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\pub\PubController.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\reservations\ReservationController.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\SimpleController.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\controller\vol\VolController.java
@@ -14,6 +15,9 @@ D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\e
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\passagers\Passager.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\pilotes\Pilote.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\prix\PrixVol.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\pub\DiffusionPub.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\pub\Publicite.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\pub\Societe.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\reservations\Reservation.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\SimpleEntity.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\model\utilisateurs\Utilisateur.java
@@ -25,6 +29,10 @@ D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\reposit
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\compagnies\CompagnieRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\passagers\PassagerRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\prix\PrixVolRepository.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\pub\DiffusionPubRepository.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\pub\PubliciteRepository.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\pub\PubRevenueView.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\pub\SocieteRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\reservations\ReservationRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\SimpleEntityRepository.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\repository\utilisateurs\UtilisateurRepository.java
@@ -38,6 +46,7 @@ D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\compagnies\CompagnieService.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\passagers\PassagerService.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\prix\PrixVolService.java
+D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\pub\PubService.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\reservations\ReservationService.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\SimpleService.java
 D:\ITU\Mme_Baovola\compagnie-aerienne\src\main\java\com\aerienne\gestion\service\utilisateurs\UtilisateurService.java
