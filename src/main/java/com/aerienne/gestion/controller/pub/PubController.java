@@ -202,7 +202,20 @@ public class PubController {
         if (session.getAttribute("username") == null) {
             return "redirect:/login";
         }
-        model.addAttribute("diffusions", pubService.listDiffusions());
+        var diffusions = pubService.listDiffusions();
+        var paiementMap = pubService.paiementTotalsByDiffusion(diffusions.stream().map(DiffusionPub::getIdDiffusion).toList());
+        double totalCa = diffusions.stream()
+            .mapToDouble(d -> (d.getNombreDiffusions() != null ? d.getNombreDiffusions() : 0)
+                * (d.getPrixParDiffusion() != null ? d.getPrixParDiffusion() : 0d))
+            .sum();
+        double totalPaiement = paiementMap.values().stream().mapToDouble(Double::doubleValue).sum();
+        double totalReste = totalCa - totalPaiement;
+
+        model.addAttribute("diffusions", diffusions);
+        model.addAttribute("paiementMap", paiementMap);
+        model.addAttribute("totalCa", totalCa);
+        model.addAttribute("totalPaiement", totalPaiement);
+        model.addAttribute("totalReste", totalReste);
         return "views/pub/list";
     }
 
@@ -222,13 +235,14 @@ public class PubController {
                          @RequestParam Integer mois,
                          @RequestParam Integer nombreDiffusions,
                          @RequestParam Double prixParDiffusion,
+                         @RequestParam(required = false, defaultValue = "0") Double paiement,
                          HttpSession session,
                          RedirectAttributes redirectAttributes) {
         if (session.getAttribute("username") == null) {
             return "redirect:/login";
         }
         try {
-            pubService.saveDiffusion(null, publiciteId, volId, annee, mois, nombreDiffusions, prixParDiffusion);
+            pubService.saveDiffusion(null, publiciteId, volId, annee, mois, nombreDiffusions, prixParDiffusion, paiement);
             redirectAttributes.addFlashAttribute("success", "Diffusion pub ajoutée");
             return "redirect:/pub";
         } catch (IllegalArgumentException ex) {
@@ -260,13 +274,14 @@ public class PubController {
                           @RequestParam Integer mois,
                           @RequestParam Integer nombreDiffusions,
                           @RequestParam Double prixParDiffusion,
+                          @RequestParam(required = false, defaultValue = "0") Double paiement,
                           HttpSession session,
                           RedirectAttributes redirectAttributes) {
         if (session.getAttribute("username") == null) {
             return "redirect:/login";
         }
         try {
-            pubService.saveDiffusion(id, publiciteId, volId, annee, mois, nombreDiffusions, prixParDiffusion);
+            pubService.saveDiffusion(id, publiciteId, volId, annee, mois, nombreDiffusions, prixParDiffusion, paiement);
             redirectAttributes.addFlashAttribute("success", "Diffusion pub mise à jour");
             return "redirect:/pub";
         } catch (IllegalArgumentException ex) {

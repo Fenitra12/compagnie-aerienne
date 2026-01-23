@@ -1,15 +1,4 @@
--- Mise à jour du prix adulte et du prix enfant (prix_reduction) pour le vol 8
-UPDATE prix_vol
-SET prix = 250.00,
-	prix_reduction = 250.00
-WHERE id_vol = 8 AND classe = 'Economy';
+INSERT INTO paiement_pub (id_diffusion, montant) VALUES
+    ((SELECT id_diffusion FROM diffusion_pub LIMIT 1), 1000000);
 
-UPDATE prix_vol
-SET prix = 250.00,
-	prix_reduction = 250.00
-WHERE id_vol = 8 AND classe = 'premium';
-
-UPDATE prix_vol
-SET prix = 250.00,
-	prix_reduction = 250.00
-WHERE id_vol = 8 AND classe = 'First';
+SELECT * from paiement_pub;

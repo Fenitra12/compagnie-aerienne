@@ -36,6 +36,7 @@ public class DiffusionPub {
     @Column(name = "prix_par_diffusion")
     private Double prixParDiffusion;
 
+
     public Long getIdDiffusion() {
         return idDiffusion;
     }
@@ -91,4 +92,5 @@ public class DiffusionPub {
     public void setPrixParDiffusion(Double prixParDiffusion) {
         this.prixParDiffusion = prixParDiffusion;
     }
+
 }

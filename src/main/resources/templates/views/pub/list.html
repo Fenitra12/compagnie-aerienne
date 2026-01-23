@@ -27,6 +27,9 @@
                 <p class="badge">Résumé</p>
                 <h2 class="section-title">Nombre d'entrées</h2>
                 <h3 th:text="${diffusions == null ? 0 : diffusions.size()} + ' enregistrements'"></h3>
+                <p th:text="'Montant payé : ' + ${#numbers.formatDecimal(totalPaiement, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></p>
+                <p th:text="'CA total : ' + ${#numbers.formatDecimal(totalCa, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></p>
+                <p th:text="'Reste à payer : ' + ${#numbers.formatDecimal(totalReste, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></p>
                 <div style="margin-top: 12px;">
                     <a href="/pub/add" class="btn-primary" style="margin-right: 8px;">Ajouter</a>
                     <a href="/pub/stats" class="btn-secondary">Voir CA pub</a>
@@ -62,6 +65,8 @@
                         <th>Diffusions</th>
                         <th>Prix unitaire</th>
                         <th>CA</th>
+                        <th>Paiement (Ar)</th>
+                        <th>Reste à payer (Ar)</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
@@ -75,6 +80,8 @@
                         <td th:text="${d.nombreDiffusions}"></td>
                         <td th:text="${#numbers.formatDecimal(d.prixParDiffusion, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
                         <td th:text="${#numbers.formatDecimal(d.nombreDiffusions * d.prixParDiffusion, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(paiementMap[d.idDiffusion] != null ? paiementMap[d.idDiffusion] : 0, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(d.nombreDiffusions * d.prixParDiffusion - (paiementMap[d.idDiffusion] != null ? paiementMap[d.idDiffusion] : 0), 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
                         <td>
                             <a th:href="@{/pub/edit/{id}(id=${d.idDiffusion})}" class="btn-edit">Modifier</a>
                             <form th:action="@{/pub/delete/{id}(id=${d.idDiffusion})}" method="post" style="display:inline;">

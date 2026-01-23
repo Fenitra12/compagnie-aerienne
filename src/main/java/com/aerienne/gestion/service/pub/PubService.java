@@ -13,10 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.aerienne.gestion.model.pub.DiffusionPub;
+import com.aerienne.gestion.model.pub.PaiementPub;
 import com.aerienne.gestion.model.pub.Publicite;
 import com.aerienne.gestion.model.pub.Societe;
 import com.aerienne.gestion.model.vol.Vol;
 import com.aerienne.gestion.repository.pub.DiffusionPubRepository;
+import com.aerienne.gestion.repository.pub.PaiementPubRepository;
 import com.aerienne.gestion.repository.pub.PubRevenueView;
 import com.aerienne.gestion.repository.pub.PubliciteRepository;
 import com.aerienne.gestion.repository.pub.SocieteRepository;
@@ -27,6 +29,9 @@ public class PubService {
 
         @Autowired
         private DiffusionPubRepository diffusionPubRepository;
+
+        @Autowired
+        private PaiementPubRepository paiementPubRepository;
 
         @Autowired
         private PubliciteRepository publiciteRepository;
@@ -109,7 +114,8 @@ public class PubService {
                                                                           Integer annee,
                                                                           Integer mois,
                                                                           Integer nombreDiffusions,
-                                                                          Double prixParDiffusion) {
+                                                                          Double prixParDiffusion,
+                                                                          Double paiement) {
                 if (publiciteId == null) {
                         throw new IllegalArgumentException("Publicite requise");
                 }
@@ -136,7 +142,15 @@ public class PubService {
                 entity.setMois(mois);
                 entity.setNombreDiffusions(nombreDiffusions != null ? nombreDiffusions : 0);
                 entity.setPrixParDiffusion(prixParDiffusion != null ? prixParDiffusion : 0d);
-                return diffusionPubRepository.save(entity);
+                DiffusionPub saved = diffusionPubRepository.save(entity);
+
+                if (paiement != null && paiement > 0) {
+                        PaiementPub pay = new PaiementPub();
+                        pay.setDiffusion(saved);
+                        pay.setMontant(paiement);
+                        paiementPubRepository.save(pay);
+                }
+                return saved;
         }
 
         public void deleteDiffusion(Long id) {
@@ -170,4 +184,15 @@ public class PubService {
                 .sorted((a, b) -> Double.compare(b.getRevenue(), a.getRevenue()))
                 .collect(Collectors.toList());
     }
+
+        public Map<Long, Double> paiementTotalsByDiffusion(List<Long> diffusionIds) {
+                if (diffusionIds == null || diffusionIds.isEmpty()) {
+                        return Map.of();
+                }
+                return paiementPubRepository.sumByDiffusionIds(diffusionIds).stream()
+                                .collect(Collectors.toMap(
+                                                r -> (Long) r[0],
+                                                r -> r[1] != null ? ((Number) r[1]).doubleValue() : 0d
+                                ));
+        }
 }

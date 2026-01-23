@@ -158,6 +158,13 @@ CREATE TABLE diffusion_pub (
     prix_par_diffusion NUMERIC(15,2) NOT NULL
 );
 
+CREATE TABLE paiement_pub (
+    id_paiement SERIAL PRIMARY KEY,
+    id_diffusion INT NOT NULL REFERENCES diffusion_pub(id_diffusion) ON DELETE CASCADE,
+    montant NUMERIC(15,2) NOT NULL,
+    date_paiement TIMESTAMP DEFAULT NOW()
+);
+
 
 -- Insérer le compte admin par défaut
 INSERT INTO Utilisateur (username, mot_de_passe, role)
@@ -324,8 +331,12 @@ INSERT INTO Publicite (id_societe, titre) VALUES
   ((SELECT id_societe FROM Societe WHERE nom='Lewis'), 'Pub Lewis');
 
 INSERT INTO diffusion_pub (id_publicite, id_vol, annee, mois, nombre_diffusions, prix_par_diffusion) VALUES
-    ((SELECT id_publicite FROM Publicite WHERE titre='Pub Vaniala'), 8, 2025, 12, 20, 200000),
-    ((SELECT id_publicite FROM Publicite WHERE titre='Pub Lewis'), 8, 2025, 12, 10, 200000);
+    ((SELECT id_publicite FROM Publicite WHERE titre='Pub Vaniala'), 8, 2025, 12, 20, 400000),
+    ((SELECT id_publicite FROM Publicite WHERE titre='Pub Lewis'), 8, 2025, 12, 10, 400000);
+
+-- Paiements de test
+INSERT INTO paiement_pub (id_diffusion, montant) VALUES
+    ((SELECT id_diffusion FROM diffusion_pub LIMIT 1), 1000000);
 
 
 -- CA prenant en compte le prix enfant déjà réduit
