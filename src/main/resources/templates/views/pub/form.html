@@ -37,20 +37,13 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="volId">Vol (optionnel)</label>
-                        <select id="volId" name="volId">
-                            <option th:value="${null}" th:selected="${diffusion.vol == null}">Non lié</option>
-                            <option th:each="v : ${vols}" th:value="${v.idVol}" th:text="${v.aeroportDepart.codeIata + ' -> ' + v.aeroportArrivee.codeIata}"
+                        <label for="volId">Vol</label>
+                        <select id="volId" name="volId" required>
+                            <option value="" disabled th:selected="${diffusion.vol == null}">Choisir un vol</option>
+                            <option th:each="v : ${vols}" th:value="${v.idVol}"
+                                    th:text="${'Vol ' + v.idVol + ' · ' + v.aeroportDepart.codeIata + ' -> ' + v.aeroportArrivee.codeIata + ' · ' + #temporals.format(v.dateDepart, 'dd/MM/yyyy HH:mm')}"
                                     th:selected="${diffusion.vol != null && diffusion.vol.idVol == v.idVol}"></option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="annee">Année</label>
-                        <input type="number" id="annee" name="annee" min="2000" max="2100" required th:value="${diffusion.annee}">
-                    </div>
-                    <div class="form-group">
-                        <label for="mois">Mois</label>
-                        <input type="number" id="mois" name="mois" min="1" max="12" required th:value="${diffusion.mois}">
                     </div>
                     <div class="form-group">
                         <label for="nombreDiffusions">Nombre de diffusions</label>

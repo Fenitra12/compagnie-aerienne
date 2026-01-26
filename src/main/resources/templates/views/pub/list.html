@@ -35,6 +35,8 @@
                     <a href="/pub/stats" class="btn-secondary">Voir CA pub</a>
                     <a href="/pub/publicites" class="btn-secondary" style="margin-left: 8px;">Publicités</a>
                     <a href="/pub/societes" class="btn-secondary" style="margin-left: 8px;">Sociétés</a>
+                    <a href="/pub/paiement" class="btn-secondary" style="margin-left: 8px;">Paiement global</a>
+                    <a href="/pub/paiement-diffusion" class="btn-secondary" style="margin-left: 8px;">Paiement par diffusion</a>
                 </div>
             </article>
         </section>
@@ -61,12 +63,12 @@
                         <th>Société</th>
                         <th>Publicité</th>
                         <th>Vol</th>
-                        <th>Période</th>
+                        <th>Date départ vol</th>
                         <th>Diffusions</th>
                         <th>Prix unitaire</th>
                         <th>CA</th>
-                        <th>Paiement (Ar)</th>
-                        <th>Reste à payer (Ar)</th>
+                        <th>% payé</th>
+                        <th>% non payé</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
@@ -76,12 +78,12 @@
                         <td th:text="${d.publicite != null && d.publicite.societe != null ? d.publicite.societe.nom : 'N/A'}"></td>
                         <td th:text="${d.publicite != null ? d.publicite.titre : 'N/A'}"></td>
                         <td th:text="${d.vol != null ? d.vol.aeroportDepart.codeIata + ' -> ' + d.vol.aeroportArrivee.codeIata : 'Non lié'}"></td>
-                        <td th:text="${d.annee} + '-' + ${#numbers.formatInteger(d.mois != null ? d.mois : 0, 2)}"></td>
+                        <td th:text="${d.vol != null && d.vol.dateDepart != null ? #temporals.format(d.vol.dateDepart, 'dd/MM/yyyy HH:mm') : 'N/A'}"></td>
                         <td th:text="${d.nombreDiffusions}"></td>
                         <td th:text="${#numbers.formatDecimal(d.prixParDiffusion, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
                         <td th:text="${#numbers.formatDecimal(d.nombreDiffusions * d.prixParDiffusion, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
-                        <td th:text="${#numbers.formatDecimal(paiementMap[d.idDiffusion] != null ? paiementMap[d.idDiffusion] : 0, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
-                        <td th:text="${#numbers.formatDecimal(d.nombreDiffusions * d.prixParDiffusion - (paiementMap[d.idDiffusion] != null ? paiementMap[d.idDiffusion] : 0), 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(((factureMap[d.publicite.societe.idSociete]?.montantPaye != null ? factureMap[d.publicite.societe.idSociete].montantPaye : 0) / (factureMap[d.publicite.societe.idSociete]?.montantTotal != null ? factureMap[d.publicite.societe.idSociete].montantTotal : 1)) * 100, 1, 'COMMA', 2, 'POINT')} + ' %'"></td>
+                        <td th:text="${#numbers.formatDecimal(100 - (((factureMap[d.publicite.societe.idSociete]?.montantPaye != null ? factureMap[d.publicite.societe.idSociete].montantPaye : 0) / (factureMap[d.publicite.societe.idSociete]?.montantTotal != null ? factureMap[d.publicite.societe.idSociete].montantTotal : 1)) * 100), 1, 'COMMA', 2, 'POINT')} + ' %'"></td>
                         <td>
                             <a th:href="@{/pub/edit/{id}(id=${d.idDiffusion})}" class="btn-edit">Modifier</a>
                             <form th:action="@{/pub/delete/{id}(id=${d.idDiffusion})}" method="post" style="display:inline;">

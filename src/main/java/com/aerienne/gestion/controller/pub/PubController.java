@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.aerienne.gestion.model.pub.DiffusionPub;
+import com.aerienne.gestion.model.pub.FacturePub;
 import com.aerienne.gestion.model.pub.Publicite;
 import com.aerienne.gestion.model.pub.Societe;
 import com.aerienne.gestion.service.aeroports.AeroportService;
@@ -204,15 +205,22 @@ public class PubController {
         }
         var diffusions = pubService.listDiffusions();
         var paiementMap = pubService.paiementTotalsByDiffusion(diffusions.stream().map(DiffusionPub::getIdDiffusion).toList());
+        var factureMap = pubService.factureBySociete();
+
         double totalCa = diffusions.stream()
             .mapToDouble(d -> (d.getNombreDiffusions() != null ? d.getNombreDiffusions() : 0)
                 * (d.getPrixParDiffusion() != null ? d.getPrixParDiffusion() : 0d))
             .sum();
-        double totalPaiement = paiementMap.values().stream().mapToDouble(Double::doubleValue).sum();
-        double totalReste = totalCa - totalPaiement;
+        double totalPaiement = factureMap.values().stream()
+            .mapToDouble(f -> f.getMontantPaye() != null ? f.getMontantPaye() : 0d)
+            .sum();
+        double totalReste = factureMap.values().stream()
+            .mapToDouble(f -> f.getResteAPayer() != null ? f.getResteAPayer() : 0d)
+            .sum();
 
         model.addAttribute("diffusions", diffusions);
         model.addAttribute("paiementMap", paiementMap);
+        model.addAttribute("factureMap", factureMap);
         model.addAttribute("totalCa", totalCa);
         model.addAttribute("totalPaiement", totalPaiement);
         model.addAttribute("totalReste", totalReste);
@@ -231,8 +239,6 @@ public class PubController {
     @PostMapping("/pub/add")
     public String addPub(@RequestParam Long publiciteId,
                          @RequestParam(required = false) Long volId,
-                         @RequestParam Integer annee,
-                         @RequestParam Integer mois,
                          @RequestParam Integer nombreDiffusions,
                          @RequestParam Double prixParDiffusion,
                          @RequestParam(required = false, defaultValue = "0") Double paiement,
@@ -242,7 +248,7 @@ public class PubController {
             return "redirect:/login";
         }
         try {
-            pubService.saveDiffusion(null, publiciteId, volId, annee, mois, nombreDiffusions, prixParDiffusion, paiement);
+            pubService.saveDiffusion(null, publiciteId, volId, nombreDiffusions, prixParDiffusion, paiement);
             redirectAttributes.addFlashAttribute("success", "Diffusion pub ajoutée");
             return "redirect:/pub";
         } catch (IllegalArgumentException ex) {
@@ -270,8 +276,6 @@ public class PubController {
     public String editPub(@PathVariable Long id,
                           @RequestParam Long publiciteId,
                           @RequestParam(required = false) Long volId,
-                          @RequestParam Integer annee,
-                          @RequestParam Integer mois,
                           @RequestParam Integer nombreDiffusions,
                           @RequestParam Double prixParDiffusion,
                           @RequestParam(required = false, defaultValue = "0") Double paiement,
@@ -281,7 +285,7 @@ public class PubController {
             return "redirect:/login";
         }
         try {
-            pubService.saveDiffusion(id, publiciteId, volId, annee, mois, nombreDiffusions, prixParDiffusion, paiement);
+            pubService.saveDiffusion(id, publiciteId, volId, nombreDiffusions, prixParDiffusion, paiement);
             redirectAttributes.addFlashAttribute("success", "Diffusion pub mise à jour");
             return "redirect:/pub";
         } catch (IllegalArgumentException ex) {
@@ -340,6 +344,67 @@ public class PubController {
         model.addAttribute("selectedCompagnie", compagnieId);
 
         return "views/pub/stats";
+    }
+
+    @GetMapping("/pub/paiement")
+    public String showPaiementSociete(Model model, HttpSession session) {
+        if (session.getAttribute("username") == null) {
+            return "redirect:/login";
+        }
+        var societes = pubService.listSocietes();
+        societes.forEach(s -> pubService.refreshFactureForSociete(s.getIdSociete()));
+
+        List<FacturePub> factures = pubService.listFactures();
+        model.addAttribute("factures", factures);
+        model.addAttribute("societes", societes);
+        return "views/pub/pay";
+    }
+
+    @PostMapping("/pub/paiement")
+    public String paySociete(@RequestParam Long societeId,
+                             @RequestParam Double montant,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("username") == null) {
+            return "redirect:/login";
+        }
+        try {
+            pubService.paySociete(societeId, montant);
+            redirectAttributes.addFlashAttribute("success", "Paiement enregistré");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/pub/paiement";
+    }
+
+    @GetMapping("/pub/paiement-diffusion")
+    public String showPaiementDiffusion(Model model, HttpSession session) {
+        if (session.getAttribute("username") == null) {
+            return "redirect:/login";
+        }
+        var diffusions = pubService.listDiffusions();
+        var paiementMap = pubService.paiementTotalsByDiffusion(diffusions.stream().map(DiffusionPub::getIdDiffusion).toList());
+
+        model.addAttribute("diffusions", diffusions);
+        model.addAttribute("paiementMap", paiementMap);
+        return "views/pub/pay-diffusion";
+    }
+
+    @PostMapping("/pub/paiement-diffusion")
+    public String payDiffusion(@RequestParam Long diffusionId,
+                               @RequestParam Double montant,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("username") == null) {
+            return "redirect:/login";
+        }
+        try {
+            pubService.payDiffusion(diffusionId, montant);
+            redirectAttributes.addFlashAttribute("success", "Paiement enregistré");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/pub/paiement-diffusion";
     }
 
     private void prepareFormModel(Model model, DiffusionPub diffusion) {

@@ -100,7 +100,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="cls, idx : ${#arrays.asList('Economy','Business','First')}">
+                        <tr th:each="cls, idx : ${ {'Economy','Business','First'} }">
                             <td>
                                 <input type="text" name="classe" th:value="${cls}" class="form-control" required>
                             </td>

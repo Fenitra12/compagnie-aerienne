@@ -47,7 +47,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Passager</th>
-                        <th>Vol</th>
+                        <th>Vol (départ)</th>
                         <th>Classe</th>
                         <th>Prix unitaire</th>
                         <th>Adultes</th>
@@ -63,7 +63,7 @@
                     <tr th:each="reservation : ${reservations}">
                         <td th:text="${reservation.idReservation}"></td>
                         <td th:text="${reservation.passager.nom} + ' ' + ${reservation.passager.prenom}"></td>
-                        <td th:text="${reservation.prixVol.vol.aeroportDepart.codeIata} + ' → ' + ${reservation.prixVol.vol.aeroportArrivee.codeIata}"></td>
+                        <td th:text="${reservation.prixVol.vol.aeroportDepart.codeIata} + ' → ' + ${reservation.prixVol.vol.aeroportArrivee.codeIata} + ' - ' + ${#temporals.format(reservation.prixVol.vol.dateDepart, 'dd/MM/yyyy HH:mm')}"></td>
                         <td th:text="${reservation.prixVol.classe}"></td>
                         <td th:text="${reservation.prixVol.prix} + ' €'"></td>
                         <td th:text="${reservation.adultCount ?: 0}"></td>

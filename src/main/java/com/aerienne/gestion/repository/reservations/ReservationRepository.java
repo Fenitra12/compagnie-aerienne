@@ -16,6 +16,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
 		long countByPrixVol_IdPrix(Long idPrix);
 
+		long countByPrixVol_Vol_IdVol(Long volId);
+
 		@Query("""
 				SELECT new com.aerienne.gestion.repository.vol.VolRevenueView(
 						v,

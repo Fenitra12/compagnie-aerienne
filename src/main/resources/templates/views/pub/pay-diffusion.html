@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement par diffusion | Compagnie aérienne</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="ui/menu :: menu"></div>
+
+    <main class="main-area">
+        <header class="main-header">
+            <div>
+                <p class="eyebrow">Fenitra ETU003660</p>
+                <h1>Paiement par diffusion</h1>
+            </div>
+            <div class="user-chip">
+                <span class="status-dot"></span>
+                <span>Encaissement ciblé</span>
+            </div>
+        </header>
+
+        <section class="content-section" th:if="${success != null || error != null}">
+            <article class="card" th:classappend=" ${error != null} ? ' card-danger' : ' card-success'">
+                <p class="badge" th:text="${error != null} ? 'Erreur' : 'Succès'"></p>
+                <p th:text="${error != null} ? ${error} : ${success}"></p>
+            </article>
+        </section>
+
+        <section class="content-section">
+            <article class="card">
+                <p class="badge">Encaissement</p>
+                <h2 class="section-title">Enregistrer un paiement par diffusion</h2>
+                <form th:action="@{/pub/paiement-diffusion}" method="post" class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+                    <div class="form-group">
+                        <label for="diffusionId">Diffusion</label>
+                        <select id="diffusionId" name="diffusionId" required>
+                            <option value="" disabled selected>Choisir...</option>
+                            <option th:each="d : ${diffusions}"
+                                    th:value="${d.idDiffusion}"
+                                    th:text="${(d.publicite != null ? d.publicite.titre : 'N/A')
+                                            + ' · ' +
+                                            (d.vol != null
+                                                ? d.vol.aeroportDepart.codeIata + ' -> ' + d.vol.aeroportArrivee.codeIata + ' ' + #temporals.format(d.vol.dateDepart, 'dd/MM/yyyy HH:mm')
+                                                : 'Sans vol')}" ></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="montant">Montant (Ar)</label>
+                        <input type="number" step="0.01" min="0" id="montant" name="montant" required placeholder="0">
+                    </div>
+                    <div class="form-group" style="align-self: end;">
+                        <button type="submit" class="btn-primary">Enregistrer</button>
+                        <a href="/pub" class="btn-secondary" style="margin-left: 6px;">Retour</a>
+                    </div>
+                </form>
+            </article>
+        </section>
+
+        <section class="table-wrapper">
+            <header>
+                <div>
+                    <p class="badge">Synthèse</p>
+                    <h2 class="section-title">Diffusions et paiements</h2>
+                </div>
+            </header>
+            <div class="table-responsive" style="overflow-x:auto;">
+                <table class="data-table" style="min-width: 1080px;">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Société</th>
+                        <th>Publicité</th>
+                        <th>Vol</th>
+                        <th>Date départ</th>
+                        <th>Diffusions</th>
+                        <th>Prix unitaire</th>
+                        <th>CA diffusion</th>
+                        <th>Payé</th>
+                        <th>Reste</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="d : ${diffusions}">
+                        <td th:text="${d.idDiffusion}"></td>
+                        <td th:text="${d.publicite != null && d.publicite.societe != null ? d.publicite.societe.nom : 'N/A'}"></td>
+                        <td th:text="${d.publicite != null ? d.publicite.titre : 'N/A'}"></td>
+                        <td th:text="${d.vol != null ? d.vol.aeroportDepart.codeIata + ' -> ' + d.vol.aeroportArrivee.codeIata : 'Non lié'}"></td>
+                        <td th:text="${d.vol != null && d.vol.dateDepart != null ? #temporals.format(d.vol.dateDepart, 'dd/MM/yyyy HH:mm') : 'N/A'}"></td>
+                        <td th:text="${d.nombreDiffusions}"></td>
+                        <td th:text="${#numbers.formatDecimal(d.prixParDiffusion, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal((d.nombreDiffusions != null ? d.nombreDiffusions : 0) * (d.prixParDiffusion != null ? d.prixParDiffusion : 0), 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(paiementMap[d.idDiffusion] != null ? paiementMap[d.idDiffusion] : 0, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(((d.nombreDiffusions != null ? d.nombreDiffusions : 0) * (d.prixParDiffusion != null ? d.prixParDiffusion : 0)) - (paiementMap[d.idDiffusion] != null ? paiementMap[d.idDiffusion] : 0), 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="main-footer">
+            <span>© 2026 Compagnie aérienne</span>
+            <span>Interface conçue pour ETU003660</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

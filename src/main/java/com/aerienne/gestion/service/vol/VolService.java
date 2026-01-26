@@ -14,6 +14,7 @@ import com.aerienne.gestion.repository.vol.VolPlaceClasseRepository;
 import com.aerienne.gestion.repository.prix.PrixVolRepository;
 import com.aerienne.gestion.repository.vol.projection.VolClassRevenue;
 import com.aerienne.gestion.repository.reservations.ReservationRepository;
+import com.aerienne.gestion.repository.pub.DiffusionPubRepository;
 
 @Service
 public class VolService {
@@ -29,6 +30,9 @@ public class VolService {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private DiffusionPubRepository diffusionPubRepository;
 
     public List<Vol> getAllVols() {
         return volRepository.findAll();
@@ -126,7 +130,16 @@ public class VolService {
         return prixVolRepository.findByVol_IdVol(volId);
     }
 
+    @Transactional
     public void deleteVol(Long id) {
+        long reservationCount = reservationRepository.countByPrixVol_Vol_IdVol(id);
+        if (reservationCount > 0) {
+            throw new IllegalStateException("Impossible de supprimer ce vol : des réservations existent.");
+        }
+
+        diffusionPubRepository.deleteByVol_IdVol(id);
+        prixVolRepository.deleteByVol_IdVol(id);
+        volPlaceClasseRepository.deleteByVol_IdVol(id);
         volRepository.deleteById(id);
     }
 

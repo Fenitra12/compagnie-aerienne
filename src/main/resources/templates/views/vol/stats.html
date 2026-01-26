@@ -70,8 +70,9 @@
                 <p class="badge">Top</p>
                 <h2 class="section-title">Vol le plus rentable</h2>
                 <p class="module-description" th:text="${topVol.vol.aeroportDepart.codeIata} + ' -> ' + ${topVol.vol.aeroportArrivee.codeIata}"></p>
-                <h3 th:text="${#numbers.formatDecimal(topVol.revenue, 1, 'COMMA', 2, 'POINT')} + ' Ar'">0 Ar</h3>
+                <h3 th:text="${#numbers.formatDecimal(topVol.totalRevenue, 1, 'COMMA', 2, 'POINT')} + ' Ar'">0 Ar</h3>
                 <p th:text="${topVol.reservationsCount} + ' reservations'">0 reservations</p>
+                <p class="module-description" style="margin-top: 8px;" th:text="'Billets: ' + ${#numbers.formatDecimal(topVol.ticketRevenue, 1, 'COMMA', 2, 'POINT')} + ' Ar · Pub: ' + ${#numbers.formatDecimal(topVol.adRevenue, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></p>
             </article>
         </section>
 
@@ -110,7 +111,13 @@
                         <th>Depart</th>
                         <th>Arrivee</th>
                         <th>Reservations</th>
-                        <th>CA</th>
+                        <th>CA billets</th>
+                        <th>CA pub</th>
+                        <!-- <th>% pub payé</th>
+                        <th>% pub non payé</th> -->
+                        <th>Payé Total</th>
+                        <th>Reste à payer</th>
+                        <th>CA total</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -121,9 +128,26 @@
                         <td th:text="${#temporals.format(stat.vol.dateDepart, 'dd/MM/yyyy HH:mm')}"></td>
                         <td th:text="${#temporals.format(stat.vol.dateArrivee, 'dd/MM/yyyy HH:mm')}"></td>
                         <td th:text="${stat.reservationsCount}"></td>
-                        <td th:text="${#numbers.formatDecimal(stat.revenue, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(stat.ticketRevenue, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(stat.adRevenue, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <!-- <td th:text="${#numbers.formatDecimal(stat.adPaidPercent, 1, 'COMMA', 2, 'POINT')} + ' %'"></td>
+                        <td th:text="${#numbers.formatDecimal(stat.adUnpaidPercent, 1, 'COMMA', 2, 'POINT')} + ' %'"></td> -->
+                        <td th:text="${#numbers.formatDecimal(stat.adPaidByDiffusion, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(stat.adResteByDiffusion, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(stat.totalRevenue, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
                     </tr>
                     </tbody>
+                    <tfoot th:if="${totals != null}">
+                    <tr>
+                        <td colspan="5">Total</td>
+                        <td th:text="${totals.reservationsCount}"></td>
+                        <td th:text="${#numbers.formatDecimal(totals.ticketRevenue, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(totals.adRevenue, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(totals.adPaidByDiffusion, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(totals.adResteByDiffusion, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                        <td th:text="${#numbers.formatDecimal(totals.totalRevenue, 1, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                    </tr>
+                    </tfoot>
                 </table>
             </div>
         </section>
@@ -139,7 +163,8 @@
 /*<![CDATA[*/
     const stats = /*[[${stats}]]*/ [];
     const labels = /*[[${chartLabels}]]*/ [];
-    const revenues = /*[[${chartRevenues}]]*/ [];
+    const ticketRevenues = /*[[${chartTicketRevenues}]]*/ [];
+    const adRevenues = /*[[${chartAdRevenues}]]*/ [];
 
     if (stats && stats.length && document.getElementById('revenueChart')) {
         const ctx = document.getElementById('revenueChart').getContext('2d');
@@ -148,10 +173,16 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Revenu (Ar)',
-                    data: revenues,
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    label: 'Billets (Ar)',
+                    data: ticketRevenues,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
                     borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Pub (Ar)',
+                    data: adRevenues,
+                    backgroundColor: 'rgba(255, 159, 64, 0.7)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
                     borderWidth: 1
                 }]
             },
@@ -159,9 +190,8 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+                    x: { stacked: true },
+                    y: { beginAtZero: true, stacked: true }
                 },
                 plugins: {
                     legend: { display: true }

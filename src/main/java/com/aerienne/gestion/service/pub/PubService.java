@@ -13,15 +13,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.aerienne.gestion.model.pub.DiffusionPub;
+import com.aerienne.gestion.model.pub.FacturePub;
+import com.aerienne.gestion.model.pub.PaiementFacturePub;
 import com.aerienne.gestion.model.pub.PaiementPub;
 import com.aerienne.gestion.model.pub.Publicite;
 import com.aerienne.gestion.model.pub.Societe;
 import com.aerienne.gestion.model.vol.Vol;
 import com.aerienne.gestion.repository.pub.DiffusionPubRepository;
+import com.aerienne.gestion.repository.pub.FacturePubRepository;
+import com.aerienne.gestion.repository.pub.PaiementFacturePubRepository;
 import com.aerienne.gestion.repository.pub.PaiementPubRepository;
 import com.aerienne.gestion.repository.pub.PubRevenueView;
 import com.aerienne.gestion.repository.pub.PubliciteRepository;
 import com.aerienne.gestion.repository.pub.SocieteRepository;
+import com.aerienne.gestion.repository.pub.VolSocieteRevenueView;
 import com.aerienne.gestion.repository.vol.VolRepository;
 
 @Service
@@ -41,6 +46,12 @@ public class PubService {
 
         @Autowired
         private VolRepository volRepository;
+
+        @Autowired
+        private FacturePubRepository facturePubRepository;
+
+        @Autowired
+        private PaiementFacturePubRepository paiementFacturePubRepository;
 
         public List<DiffusionPub> listDiffusions() {
                 return diffusionPubRepository.findAll();
@@ -111,16 +122,14 @@ public class PubService {
         public DiffusionPub saveDiffusion(Long id,
                                                                           Long publiciteId,
                                                                           Long volId,
-                                                                          Integer annee,
-                                                                          Integer mois,
                                                                           Integer nombreDiffusions,
                                                                           Double prixParDiffusion,
                                                                           Double paiement) {
                 if (publiciteId == null) {
                         throw new IllegalArgumentException("Publicite requise");
                 }
-                if (annee == null || mois == null) {
-                        throw new IllegalArgumentException("Annee et mois requis");
+                if (volId == null) {
+                        throw new IllegalArgumentException("Vol requis");
                 }
 
                 DiffusionPub entity = id != null
@@ -131,15 +140,17 @@ public class PubService {
                                 .orElseThrow(() -> new IllegalArgumentException("Publicite introuvable"));
                 entity.setPublicite(pub);
 
-                if (volId != null) {
-                        Vol vol = volRepository.findById(volId).orElse(null);
-                        entity.setVol(vol);
-                } else {
-                        entity.setVol(null);
-                }
+                Vol vol = volRepository.findById(volId)
+                                .orElseThrow(() -> new IllegalArgumentException("Vol introuvable"));
+                entity.setVol(vol);
 
-                entity.setAnnee(annee);
-                entity.setMois(mois);
+                if (vol.getDateDepart() != null) {
+                        entity.setAnnee(vol.getDateDepart().getYear());
+                        entity.setMois(vol.getDateDepart().getMonthValue());
+                } else {
+                        entity.setAnnee(null);
+                        entity.setMois(null);
+                }
                 entity.setNombreDiffusions(nombreDiffusions != null ? nombreDiffusions : 0);
                 entity.setPrixParDiffusion(prixParDiffusion != null ? prixParDiffusion : 0d);
                 DiffusionPub saved = diffusionPubRepository.save(entity);
@@ -151,6 +162,72 @@ public class PubService {
                         paiementPubRepository.save(pay);
                 }
                 return saved;
+        }
+
+        @Transactional
+        public FacturePub refreshFactureForSociete(Long societeId) {
+                if (societeId == null) {
+                        throw new IllegalArgumentException("Societe requise");
+                }
+                double total = diffusionPubRepository.sumAmountBySociete(societeId);
+                FacturePub facture = facturePubRepository.findBySociete_IdSociete(societeId)
+                                .orElseGet(() -> {
+                                        FacturePub f = new FacturePub();
+                                        Societe s = societeRepository.findById(societeId)
+                                                        .orElseThrow(() -> new IllegalArgumentException("Societe introuvable"));
+                                        f.setSociete(s);
+                                        return f;
+                                });
+                facture.setMontantTotal(total);
+                double paid = facture.getMontantPaye() != null ? facture.getMontantPaye() : 0d;
+                facture.setStatut(paid >= total ? "SOLDEE" : "EN_COURS");
+                return facturePubRepository.save(facture);
+        }
+
+        @Transactional
+        public FacturePub paySociete(Long societeId, Double montant) {
+                if (montant == null || montant <= 0) {
+                        throw new IllegalArgumentException("Montant invalide");
+                }
+                FacturePub facture = refreshFactureForSociete(societeId);
+                facture.setMontantPaye((facture.getMontantPaye() != null ? facture.getMontantPaye() : 0d) + montant);
+                double total = facture.getMontantTotal() != null ? facture.getMontantTotal() : 0d;
+                facture.setStatut(facture.getMontantPaye() >= total ? "SOLDEE" : "EN_COURS");
+                facture = facturePubRepository.save(facture);
+
+                PaiementFacturePub payment = new PaiementFacturePub();
+                payment.setFacture(facture);
+                payment.setMontant(montant);
+                paiementFacturePubRepository.save(payment);
+                return facture;
+        }
+
+        public List<FacturePub> listFactures() {
+                return facturePubRepository.findAll();
+        }
+
+        public Map<Long, FacturePub> factureBySociete() {
+                var societes = societeRepository.findAll();
+                societes.forEach(s -> refreshFactureForSociete(s.getIdSociete()));
+                return facturePubRepository.findAll().stream()
+                                .collect(Collectors.toMap(f -> f.getSociete().getIdSociete(), f -> f));
+        }
+
+        @Transactional
+        public void payDiffusion(Long diffusionId, Double montant) {
+                if (diffusionId == null) {
+                        throw new IllegalArgumentException("Diffusion requise");
+                }
+                if (montant == null || montant <= 0) {
+                        throw new IllegalArgumentException("Montant invalide");
+                }
+                DiffusionPub diffusion = diffusionPubRepository.findById(diffusionId)
+                                .orElseThrow(() -> new IllegalArgumentException("Diffusion introuvable"));
+
+                PaiementPub paiement = new PaiementPub();
+                paiement.setDiffusion(diffusion);
+                paiement.setMontant(montant);
+                paiementPubRepository.save(paiement);
         }
 
         public void deleteDiffusion(Long id) {
@@ -184,6 +261,17 @@ public class PubService {
                 .sorted((a, b) -> Double.compare(b.getRevenue(), a.getRevenue()))
                 .collect(Collectors.toList());
     }
+
+        public List<VolSocieteRevenueView> getVolAdRevenueBySociete(LocalDate startDate,
+                                                                                                                                LocalDate endDate,
+                                                                                                                                Long departId,
+                                                                                                                                Long arriveeId,
+                                                                                                                                Long compagnieId) {
+                Integer startYm = startDate != null ? startDate.getYear() * 100 + startDate.getMonthValue() : null;
+                Integer endYm = endDate != null ? endDate.getYear() * 100 + endDate.getMonthValue() : null;
+
+                return diffusionPubRepository.findRevenueByVolAndSociete(startYm, endYm, departId, arriveeId, compagnieId, true);
+        }
 
         public Map<Long, Double> paiementTotalsByDiffusion(List<Long> diffusionIds) {
                 if (diffusionIds == null || diffusionIds.isEmpty()) {
